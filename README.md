@@ -111,10 +111,10 @@ Al tratarse de una base de datos pequeña y que se actualiza poco, no es necesar
 erDiagram
 JUGADOR {
     int id_jugador
-    string nombre
-    string clase
+    string nom_jugador
     int nivel
     }
+
 
     JEFE {
         int id_jefe
@@ -148,13 +148,115 @@ JUGADOR {
 
     %% Relaciones
     JUGADOR ||--o{ ARMA : posee
+    JUGADOR ||--o{ CLASE : elige
     JUGADOR ||--o{ OBJETO : recoge
     JUGADOR ||--o{ ENEMIGO : combate
     JUGADOR ||--o{ JEFE : derrota
     JEFE }o--o{ UBICACION : aparece_en
     ENEMIGO }o--o{ UBICACION : habita
 ```
+```mermaid
+erDiagram
 
+    %% ENTIDADES
+    JUGADOR {
+        int CodigoJugador PK
+        string Nombre
+        string Estadisticas
+    }
+
+    CLASE {
+        
+        int CodigoClase PK
+        string NombreClase
+        string StatsBase
+        string ArmaBase
+        
+    }
+    CLASE_GUERRERO {
+            int id_guerrero
+        }
+    CLASE_MAGO {
+            int id_mago
+        }
+    CLASE_CABALLERO {
+            int id_caballero
+        }
+
+    OBJETO {
+        int CodigoObjeto PK
+        string NombreObjeto
+        string TipoObjeto
+    }
+
+    ARMA {
+        int CodigoObjeto PK, FK
+        int Dano
+        int NivelMejora
+    }
+
+    OBJETO_NORMAL {
+        int CodigoObjeto PK, FK
+    }
+
+    ENEMIGO {
+        int CodigoEnemigo PK
+        string Estadisticas
+    }
+
+    JEFE {
+        int CodigoJefe PK
+        string Estadisticas
+    }
+
+    MAPA {
+        int CodigoMapa PK
+    }
+
+    PUNTO_MAPA {
+        int CodigoPunto PK
+        string Coordenadas
+    }
+
+    INVENTARIO_ARMA {
+        int CodigoJugador FK
+        int CodigoObjeto FK
+        int Cantidad
+    }
+
+    OBJETOS_PORTADOS {
+        int CodigoJugador FK
+        int CodigoObjeto FK
+    }
+
+    DROP_ENEMIGO {
+        int CodigoEnemigo FK
+        int CodigoObjeto FK
+        float Probabilidad
+    }
+
+    %% RELACIONES
+    JUGADOR ||--|{ INVENTARIO_ARMA : "tiene"
+    ARMA ||--|{ INVENTARIO_ARMA : "en inventario"
+
+    JUGADOR ||--o| ARMA : "arma equipada"
+
+    JUGADOR ||--|{ OBJETOS_PORTADOS : "porta"
+    OBJETO ||--|{ OBJETOS_PORTADOS : ""
+
+    ENEMIGO ||--o| ARMA : "porta"
+    
+    ENEMIGO ||--|{ DROP_ENEMIGO : "suelta"
+    OBJETO ||--|{ DROP_ENEMIGO : ""
+
+    MAPA ||--|{ PUNTO_MAPA : "contiene"
+    PUNTO_MAPA ||--|{ ENEMIGO : "ubicación"
+
+    MAPA ||--|| JEFE : "tiene"
+    
+    OBJETO ||--|| ARMA : "subtipo"
+    OBJETO ||--|| OBJETO_NORMAL : "subtipo"
+```
 
 ## Bibliografía
 Parte de la información que hemos expuesto está en internet y otra en los apuntes de
