@@ -1,21 +1,3 @@
-## Getting Started
-
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
 
 # Bases de Datos 
 ## Proyecto Anual Segunda Entrega
@@ -46,31 +28,45 @@ Se quiere recoger información del jugador, jefes, ubicaciones del mapa, armas, 
 
 ## Requisitos del sistema
 ### Funcionales
-El jugador puede elegir distintas clases para su personaje, esta clase determina las estadísticas y armas base del jugador. Más adelante el jugador podrá redistribuir sus estadísticas, pero no cambiar de clase.
+# Requisitos funcionales
 
-Un jugador solo puede tener una clase, pero una clase puede no tener jugador.
+1. Gestión de jugadores
+- El sistema debe permitir crear, modificar y eliminar jugadores con un CodigoJugador, Nombre y Estadisticas.
+- Cada jugador debe elegir una clase al ser creado.
+- Cada jugador debe tener su inventario y estadísticas asociadas.
+- Los jugadores pueden equipar armas y objetos.
 
-El jugador puede guardar varias armas en su inventario. Puede equiparse un arma, o no llevar ninguna.
+2. Clases y especializaciones
+- El sistema debe manejar distintas clases de personaje.
+- Cada clase tiene estadísticas base y un arma base.
+- Las clases pueden ser especializadas en Guerrero, Mago o Caballero.
+- Cada jugador puede tener solo una clase activa, aunque la clase puede no tener jugadores asignados.
 
-Las armas son un tipo de objeto, y pueden encontrarse tanto en ciertos puntos del mapa, ser soltadas por enemigos básicos, o por ciertos jefes, que soltarán un arma de jefe.
+3. Objetos y armas
+- El sistema debe permitir crear y gestionar objetos con CodigoObjeto, NombreObjeto y TipoObjeto.
+- Cada arma debe estar vinculada a un objeto base y tener atributos como Dano y NivelMejora.
+- El sistema debe controlar las copias de armas disponibles en el juego.
+- Los jugadores pueden equipar objetos y armas, y estos pueden estar almacenados en el inventario.
 
-El jugador puede guardar varias veces la misma arma y mejorarla ya que en el mundo
-pueden aparecer de los enemigos una misma copia.
+4. Estadísticas
+- Los jugadores y las clases deben tener estadísticas asociadas.
+- Las estadísticas deben reflejar atributos base de la clase o mejoras obtenidas por objetos.
 
-El jugador puede portar hasta tres objetos, también puede no llevar objetos.
+5. Enemigos y jefes
+- El sistema debe permitir crear enemigos y diferenciarlos en jefes y enemigos básicos.
+- Cada enemigo puede soltar objetos.
+- Los enemigos y jefes aparecen en mapas específicos.
+- Cada jugador puede enfrentarse a enemigos y jefes.
 
-El jugador puede guardar varias veces la misma arma y mejorarla ya que en el mundo
-pueden aparecer de los enemigos una misma copia.
+6. Mapas
+- Cada mapa debe contener un inventario y enemigos.
+- Cada jefe es único por mapa.
+- El sistema debe poder listar enemigos y jefes que aparecen en un mapa determinado.
 
-Existen distintos tipos de objetos; armas arrojadizas, consumibles, los
-objetos, pueden ser soltados por los enemigos y jefes (cuando son derrotados), o encontrados en el mapa.
-
-Hay distintos tipos de enemigo repartidos por puntos del mapa, y un único jefe. 
-Del jugador interesa conocer; Código de jugador, nombre, clase, estadísticas, armas que porta, objetos que porta, objetos en el inventario.
-
-De los enemigos interesa saber; Código de enemigo, estadísticas, arma que porta, objetos que suelta y probabilidad de que lo suelte.
-
-Del mapa es necesario tener; Código de mapa, puntos en los que hay enemigos y cuales son, ubicación del jefe.
+7. Inventario
+- El inventario debe asociarse a un jugador y a un mapa.
+- Debe permitir almacenar objetos y armas.
+- Debe reflejar qué objetos y armas están actualmente equipados por el jugador.
 
 
 ### No funcionales
@@ -192,8 +188,7 @@ erDiagram
     JUGADOR ||--|| EST_JUGADOR : tiene
     ESTADISTICAS ||--|| EST_JUGADOR : basado_en
     JUGADOR ||--|| INVENTARIO : posee
-    INVENTARIO ||--o{ OBJETO : es_tipo_de
-    INVENTARIO }o--|| OBJETO : es_tipo_de
+    INVENTARIO }o--|{ OBJETO : es_tipo_de
     ARMA }|--|| INVENTARIO : es_tipo_de
     JUGADOR ||--o{ ARMA : puede_equipar
     JUGADOR ||--o{ OBJETO : puede_equipar
@@ -203,8 +198,13 @@ erDiagram
     CLASE ||--|| CLASE_GUERRERO : es_tipo_de
     CLASE ||--|| CLASE_MAGO : es_tipo_de
     CLASE ||--|| CLASE_CABALLERO : es_tipo_de
+    CLASE ||--|| ARMAS : tiene
     JUGADOR ||--|| CLASE : elige
-    ENEMIGO ||--|| MAPA : aparece_en
+    ENEMIGO }|--|{ MAPA : aparece_en
+    INVENTARIO ||--|| MAPA : tiene
+    ENEMIGO }o--o{ OBJETO : suelta
+    
+    
 
     ENEMIGO ||--|| JEFE : es_tipo_de
     ENEMIGO ||--|| ENMBASICO : es_tipo_de
