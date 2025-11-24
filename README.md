@@ -109,54 +109,6 @@ Al tratarse de una base de datos pequeña y que se actualiza poco, no es necesar
 
 ```mermaid
 erDiagram
-JUGADOR {
-    int id_jugador
-    string nom_jugador
-    int nivel
-    }
-
-
-    JEFE {
-        int id_jefe
-        string nombre
-        int dificultad
-    }
-
-    UBICACION {
-        int id_ubicacion
-        string nombre
-        string tipo
-    }
-
-    ARMA {
-        int id_arma
-        string nombre
-        int danio
-    }
-
-    OBJETO {
-        int id_objeto
-        string nombre
-        string descripcion
-    }
-
-    ENEMIGO {
-        int id_enemigo
-        string nombre
-        int nivel
-    }
-
-    %% Relaciones
-    JUGADOR ||--o{ ARMA : posee
-    JUGADOR ||--o{ CLASE : elige
-    JUGADOR ||--o{ OBJETO : recoge
-    JUGADOR ||--o{ ENEMIGO : combate
-    JUGADOR ||--o{ JEFE : derrota
-    JEFE }o--o{ UBICACION : aparece_en
-    ENEMIGO }o--o{ UBICACION : habita
-```
-```mermaid
-erDiagram
 
     %% ENTIDADES
     JUGADOR {
@@ -174,13 +126,13 @@ erDiagram
         
     }
     CLASE_GUERRERO {
-            int id_guerrero
+        int id_guerrero
         }
     CLASE_MAGO {
-            int id_mago
+        int id_mago
         }
     CLASE_CABALLERO {
-            int id_caballero
+        int id_caballero
         }
 
     OBJETO {
@@ -188,19 +140,38 @@ erDiagram
         string NombreObjeto
         string TipoObjeto
     }
+    ESTADISTICAS {
+        int CodigoObjeto PK
+    }
+    EST_JUGADOR {
+        int CodigoObjeto PK, FK
+    }
+    INVENTARIO {
+        int CodigoJugador FK
+    }
+
+    
 
     ARMA {
-        int CodigoObjeto PK, FK
+        int CodigoArma PK
+        int CodigoObjeto FK
         int Dano
         int NivelMejora
     }
 
-    OBJETO_NORMAL {
-        int CodigoObjeto PK, FK
+    COPIAS_ARMAS{
+        int CodigoArma PK
+        int NumCopias
     }
+
 
     ENEMIGO {
         int CodigoEnemigo PK
+        string Estadisticas
+    }
+
+    ENMBASICO {
+        int CodigoEnemigoBas PK
         string Estadisticas
     }
 
@@ -213,49 +184,37 @@ erDiagram
         int CodigoMapa PK
     }
 
-    PUNTO_MAPA {
-        int CodigoPunto PK
-        string Coordenadas
-    }
 
-    INVENTARIO_ARMA {
-        int CodigoJugador FK
-        int CodigoObjeto FK
-        int Cantidad
-    }
 
-    OBJETOS_PORTADOS {
-        int CodigoJugador FK
-        int CodigoObjeto FK
-    }
-
-    DROP_ENEMIGO {
-        int CodigoEnemigo FK
-        int CodigoObjeto FK
-        float Probabilidad
-    }
 
     %% RELACIONES
-    JUGADOR ||--|{ INVENTARIO_ARMA : "tiene"
-    ARMA ||--|{ INVENTARIO_ARMA : "en inventario"
-
-    JUGADOR ||--o| ARMA : "arma equipada"
-
-    JUGADOR ||--|{ OBJETOS_PORTADOS : "porta"
-    OBJETO ||--|{ OBJETOS_PORTADOS : ""
-
-    ENEMIGO ||--o| ARMA : "porta"
     
-    ENEMIGO ||--|{ DROP_ENEMIGO : "suelta"
-    OBJETO ||--|{ DROP_ENEMIGO : ""
+    JUGADOR ||--|| EST_JUGADOR : tiene
+    ESTADISTICAS ||--|| EST_JUGADOR : basado_en
+    JUGADOR ||--|| INVENTARIO : posee
+    INVENTARIO ||--o{ OBJETO : es_tipo_de
+    INVENTARIO }o--|| OBJETO : es_tipo_de
+    ARMA }|--|| INVENTARIO : es_tipo_de
+    JUGADOR ||--o{ ARMA : puede_equipar
+    JUGADOR ||--o{ OBJETO : puede_equipar
 
-    MAPA ||--|{ PUNTO_MAPA : "contiene"
-    PUNTO_MAPA ||--|{ ENEMIGO : "ubicación"
+    COPIAS_ARMAS }|--|| ARMA : depende_de
+    CLASE ||--|| ESTADISTICAS : tiene
+    CLASE ||--|| CLASE_GUERRERO : es_tipo_de
+    CLASE ||--|| CLASE_MAGO : es_tipo_de
+    CLASE ||--|| CLASE_CABALLERO : es_tipo_de
+    JUGADOR ||--|| CLASE : elige
+    ENEMIGO ||--|| MAPA : aparece_en
 
-    MAPA ||--|| JEFE : "tiene"
+    ENEMIGO ||--|| JEFE : es_tipo_de
+    ENEMIGO ||--|| ENMBASICO : es_tipo_de
+
+    JEFE ||--|| MAPA : es_unico_por
+    JUGADOR ||--o{ ENEMIGO : enfrenta
+    JUGADOR ||--|| JEFE : enfrenta
+
+
     
-    OBJETO ||--|| ARMA : "subtipo"
-    OBJETO ||--|| OBJETO_NORMAL : "subtipo"
 ```
 
 ## Bibliografía
