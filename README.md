@@ -310,6 +310,7 @@ erDiagram
 | COPIAS_ARMAS | |
 |--------------|------------|
 | codigoArma | PK, FK |
+| codigoInventario| PK, FK |
 | numCopias  |    |
 
 | ENEMIGO | |
@@ -319,12 +320,12 @@ erDiagram
 | ENMBASICO | |
 |--------------|------------|
 | codigoEnemigoBas | PK |
-| codigoEnemigo    | FK |
+| codigoEnemigo    | Pk, FK |
 
 | JEFE | |
 |--------------|------------|
 | codigoJefe     | PK |
-| codigoEnemigo  | FK |
+| codigoEnemigo  | PK, FK |
 
 | MAPA | |
 |--------------|------------|
