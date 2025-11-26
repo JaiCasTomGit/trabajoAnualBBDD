@@ -245,99 +245,90 @@ erDiagram
 ## Modelo Relacional
 | JUGADOR | |
 |--------------|------------|
-| codigoJugador   | PK      |
-| nomJugador      |         |
-
+| codigoJugador | PK |
+| nombre        |    |
+| nivel         |    |
+| codigoClase   | FK |
 
 | CLASE | |
 |--------------|------------|
-| codigoClase  | PK      |
-| nomClase     |         |
+| codigoClase | PK |
+| nomClase    |    |
 
-
-TABLA: CLASE_GUERRERO
-- codigoClase PK FK CLASE
-- id_guerrero PK
 | CLASE_GUERRERO | |
 |--------------|------------|
-| codigoClase  | FK(CLASE) PK      |
-| nomClase     |         |
+| codigoClase | PK, FK |
 
+| CLASE_MAGO | |
+|--------------|------------|
+| codigoClase | PK, FK |
 
-TABLA: CLASE_MAGO
-- codigoClase PK FK CLASE
-- id_mago PK 
+| CLASE_CABALLERO | |
+|--------------|------------|
+| codigoClase | PK, FK |
 
-TABLA: CLASE_CABALLERO
-- codigoClase PK FK CLASE
-- id_caballero PK
+| ESTADISTICAS_CLASE | |
+|--------------|------------|
+| codigoClase   | PK, FK |
+| fuerza_base   |    |
+| destreza_base |    |
+| arcano_base   |    |
+| agilidad_base |    |
+| salud_base    |    |
 
-TABLA: OBJETO
-- codInventario PK FK INVENTARIO
-- codObjeto PK
-- nomObjeto
-- tipoObjeto
+| EST_JUGADOR | |
+|--------------|------------|
+| codigoJugador | PK, FK |
+| fuerza        |    |
+| destreza      |    |
+| arcano        |    |
+| agilidad      |    |
+| salud         |    |
+| puntos_disponibles |    |
 
-TABLA: ESTADISTICAS_CLASE
-- nivel PK
-- fuerza 
-- destreza 
-- arcano
-- agilidad 
-- salud
+| INVENTARIO | |
+|--------------|------------|
+| codigoInventario | PK |
+| tipoInventario   |    |
+| codigoJugador    | FK |
+| codigoMapa       | FK |
 
-TABLA: EST_JUGADOR
-- puntosHabilidad PK
-- codigoJugador PK FK JUGADOR
+| OBJETO | |
+|--------------|------------|
+| codObjeto        | PK |
+| codigoInventario | FK |
+| nomObjeto        |    |
+| tipoObjeto       |    |
 
-TABLA: INVENTARIO
-- codigoInventario PK
-- codigoJugador FK JUGADOR
-- codigoMapa FK MAPA
+| ARMA | |
+|--------------|------------|
+| codigoArma      | PK |
+| codigoInventario| FK |
+| codigoObjeto    | FK |
+| dano            |    |
 
-TABLA: ARMA
-- codigoArma PK
-- codigoObjeto FK OBJETO
-- dano
+| COPIAS_ARMAS | |
+|--------------|------------|
+| codigoArma | PK, FK |
+| numCopias  |    |
 
-TABLA: COPIAS_ARMAS
-- codigoArma PK FK ARMA
-- numCopias
+| ENEMIGO | |
+|--------------|------------|
+| codigoEnemigo | PK |
 
-TABLA: ENEMIGO
-- codigoEnemigo PK
+| ENMBASICO | |
+|--------------|------------|
+| codigoEnemigoBas | PK |
+| codigoEnemigo    | FK |
 
-TABLA: ENMBASICO
-- codigoEnemigoBas PK FK ENEMIGO
+| JEFE | |
+|--------------|------------|
+| codigoJefe     | PK |
+| codigoEnemigo  | FK |
 
-TABLA: JEFE
-- codigoJefe PK FK ENEMIGO
-- codigoMapa FK MAPA
-
-TABLA: MAPA
-- codigoMapa PK
-- codigoInventario FK INVENTARIO
-
-RELACIONES PRINCIPALES:
-- JUGADOR 1:1 EST_JUGADOR
-- EST_JUGADOR 1:1 ESTADISTICAS_CLASE
-- JUGADOR 1:1 INVENTARIO
-- INVENTARIO 1:N OBJETO
-- ARMA 1:1 INVENTARIO
-- JUGADOR 1:N ARMA
-- JUGADOR 1:N OBJETO
-- COPIAS_ARMAS 1:1 ARMA
-- CLASE 1:1 ESTADISTICAS_CLASE
-- CLASE 1:1 CLASE_GUERRERO / CLASE_MAGO / CLASE_CABALLERO
-- CLASE 1:N ARMA
-- JUGADOR 1:1 CLASE
-- ENEMIGO N:1 MAPA
-- INVENTARIO 1:1 MAPA
-- ENEMIGO N:M OBJETO
-- ENEMIGO 1:1 JEFE / ENMBASICO
-- JEFE 1:1 MAPA
-- JUGADOR 1:N ENEMIGO
-- JUGADOR 1:1 JEFE
+| MAPA | |
+|--------------|------------|
+| codigoMapa | PK |
 
 
 ## Bibliografía
