@@ -130,17 +130,21 @@ erDiagram
         
     }
     CLASE_GUERRERO {
-        int id_guerrero
+        int CodigoClase PK, FK
+        int id_guerrero PK
         }
     CLASE_MAGO {
-        int id_mago
+        int CodigoClase PK, FK
+        int id_mago PK
         }
     CLASE_CABALLERO {
-        int id_caballero
+        int CodigoClase PK, FK
+        int id_caballero PK
         }
 
     OBJETO {
         int codObjeto PK
+        int codInventario PK, FK
         string nomObjeto
         string tipoObjeto
     }
@@ -155,6 +159,7 @@ erDiagram
     }
     EST_JUGADOR {
         int puntosHabilidad PK
+        int nivel PK, FK
     }
     INVENTARIO {
         int codigoJugador FK, PK
@@ -166,13 +171,14 @@ erDiagram
 
     ARMA {
         int codigoArma PK
-        int codigoObjeto FK
+        int codigoInventario PK, FK
+        int codigoObjeto PK, FK
         int Dano
     }
 
     COPIAS_ARMAS{
-        int codigoArma PK
-        int numCopias
+        int codigoArma PK, FK
+        int numCopias PK
     }
 
 
@@ -182,15 +188,17 @@ erDiagram
 
     ENMBASICO {
         int codigoEnemigoBas PK
+        int codigoEnemigo PK, FK
     }
 
     JEFE {
         int codigoJefe PK
+        int codigoEnemigo PK, FK
     }
 
     MAPA {
         int codigoMapa PK
-        int codigoInventario FK
+        int codigoInventario PK, FK
     }
 
 
@@ -201,8 +209,8 @@ erDiagram
     JUGADOR ||--|| EST_JUGADOR : tiene
     ESTADISTICAS ||--|| EST_JUGADOR : basado_en
     JUGADOR ||--|| INVENTARIO : posee
-    INVENTARIO }o--|{ OBJETO : es_tipo_de
-    ARMA }|--|| INVENTARIO : es_tipo_de
+    INVENTARIO ||--|| OBJETO : es_tipo_de
+    ARMA ||--|| INVENTARIO : es_tipo_de
     JUGADOR ||--o{ ARMA : puede_equipar
     JUGADOR ||--o{ OBJETO : puede_equipar
 
@@ -231,68 +239,80 @@ erDiagram
 <div style="page-break-before: always;"></div>
 
 ## Modelo Relacional
-TABLA: JUGADOR
-- codigoJugador INT PK
-- nomJugador STRING
+| JUGADOR | |
+|--------------|------------|
+| codigoJugador   | PK      |
+| nomJugador      |         |
 
-TABLA: CLASE
-- codigoClase INT PK
-- nomClase STRING
+
+| CLASE | |
+|--------------|------------|
+| codigoClase  | PK      |
+| nomClase     |         |
+
 
 TABLA: CLASE_GUERRERO
-- id_guerrero INT PK FK CLASE
+- codigoClase PK FK CLASE
+- id_guerrero PK
+| CLASE_GUERRERO | |
+|--------------|------------|
+| codigoClase  | FK(CLASE) PK      |
+| nomClase     |         |
+
 
 TABLA: CLASE_MAGO
-- id_mago INT PK FK CLASE
+- codigoClase PK FK CLASE
+- id_mago PK 
 
 TABLA: CLASE_CABALLERO
-- id_caballero INT PK FK CLASE
+- codigoClase PK FK CLASE
+- id_caballero PK
 
 TABLA: OBJETO
-- codObjeto INT PK
-- nomObjeto STRING
-- tipoObjeto STRING
+- codInventario PK FK INVENTARIO
+- codObjeto PK
+- nomObjeto
+- tipoObjeto
 
 TABLA: ESTADISTICAS
-- nivel INT PK
-- fuerza INT
-- destreza INT
-- arcano INT
-- agilidad INT
-- salud INT
+- nivel PK
+- fuerza 
+- destreza 
+- arcano
+- agilidad 
+- salud
 
 TABLA: EST_JUGADOR
-- puntosHabilidad INT PK
-- codigoJugador INT FK JUGADOR
-- nivelEstadistica INT FK ESTADISTICAS
+- puntosHabilidad PK
+- codigoJugador PK FK JUGADOR
 
 TABLA: INVENTARIO
-- codigoInventario INT PK
-- codigoJugador INT FK JUGADOR
-- codigoMapa INT FK MAPA
+- codigoInventario PK
+- codigoJugador FK JUGADOR
+- codigoMapa FK MAPA
 
 TABLA: ARMA
-- codigoArma INT PK
-- codigoObjeto INT FK OBJETO
-- dano INT
+- codigoArma PK
+- codigoObjeto FK OBJETO
+- dano
 
 TABLA: COPIAS_ARMAS
-- codigoArma INT PK FK ARMA
-- numCopias INT
+- codigoArma PK FK ARMA
+- numCopias
 
 TABLA: ENEMIGO
-- codigoEnemigo INT PK
+- codigoEnemigo PK
 
 TABLA: ENMBASICO
-- codigoEnemigoBas INT PK FK ENEMIGO
+- codigoEnemigoBas PK FK ENEMIGO
 
 TABLA: JEFE
-- codigoJefe INT PK FK ENEMIGO
-- codigoMapa INT FK MAPA
+- codigoJefe PK FK ENEMIGO
+- codigoMapa FK MAPA
 
 TABLA: MAPA
-- codigoMapa INT PK
-- codigoInventario INT FK INVENTARIO
+- codigoMapa PK
+- codigoInventario FK INVENTARIO
 
 RELACIONES PRINCIPALES:
 - JUGADOR 1:1 EST_JUGADOR
