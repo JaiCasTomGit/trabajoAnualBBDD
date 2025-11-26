@@ -21,14 +21,16 @@
         - [Plan de respaldo](#plan-de-respaldo)
 3. [Bibliografía](#bibliografía)
 
+<div style="page-break-before: always;"></div>
 
 ## Descripción del Sistema
 Una compañía de videojuegos ha desarrollado un juego en el que se controla un personaje y tienes que derrotar distintos jefes, ubicados en el mapa del juego. 
 Se quiere recoger información del jugador, jefes, ubicaciones del mapa, armas, objetos y enemigos básicos.
 
+<div style="page-break-before: always;"></div>
+
 ## Requisitos del sistema
 ### Funcionales
-# Requisitos funcionales
 
 1. Gestión de jugadores
 - El sistema debe permitir crear, modificar y eliminar jugadores con un CodigoJugador, Nombre y Estadisticas.
@@ -68,6 +70,7 @@ Se quiere recoger información del jugador, jefes, ubicaciones del mapa, armas, 
 - Debe permitir almacenar objetos y armas.
 - Debe reflejar qué objetos y armas están actualmente equipados por el jugador.
 
+<div style="page-break-before: always;"></div>
 
 ### No funcionales
 Se ha seleccionado para esta tarea, una base de datos relacional, ya que los datos de un videojuego, mantienen una relación natural entre entidades participantes del medio.
@@ -87,6 +90,9 @@ Hay varias opciones a la hora de seleccionar el _SGBD_ que más nos convene para
 - **`Oracle`**, por otro lado, es más completo. Por lo que sería perfecto si se tratara de una base de datos que estuviera en constante evolución, ya que tiene una gran escalabilidad. Sin embargo, éste no es el caso, por lo que no es el _SGBD_ que más nos conviene, aunque tenga buenas características para uso empresarial.
 
 En conclusión, por todo lo anteriormente descrito, nos decantamos por usar el _SGBD_ de **`PostgreSQL`**; por su capacidad de personalización, manejo de `JSON/CTE`, gran uso multiplataforma etc.
+
+<div style="page-break-before: always;"></div>
+
 #### Funcionamiento de BBDD distribuida
 Esta _BBDD_  funcionaría en una distribuida, aunque no tendría sentido más allá de la seguridad de la información, ya que la _BBDD_ se ejecutaría en la máquina personal del jugador. Sin embargo, si se tratará de un juego en línea, dónde las actualizaciones son constantes, podría ser preferible, para que la máquina del jugador no tenga que ejecutar dicha _BBDD_, puesto que pueden llegar a alcanzar tamaños enormes.
 
@@ -95,11 +101,16 @@ La empresa tendría un servidor central para ubicar la base de datos principal d
 Si se hiciera alguna actualización del juego, sería mediante un _script_ de migración, que en resumen es un _script_ _SQL_ que sirve para hacer cambios en una base de datos de forma segura (en el transcurso de actualizaciones). 
 Esto se haría en caso de que se añada o elimine algún arma del juego, o para contenido extra del juego.
 Cabe mencionar que se puede dar el caso de que haya un riesgo de incompatibilidad de versión, si un jugador no actualiza el juego cuando se distribuya una actualización, su _BBDD_ quedaría desactualizada, por lo que los datos podrían no coincidir con la versión que se publica, o parche actual de la empresa.
+
+<div style="page-break-before: always;"></div>
+
 #### Crecimiento
 No se prevé un gran crecimiento de esta base de datos, sin embargo, si la compañía desea hacer actualizaciones o ampliaciones de contenido (como contenido descargable, o una continuación del mismo). Se podría usar esta _BBDD_ de plantilla.
 
 #### Plan de respaldo
 Al tratarse de una base de datos pequeña y que se actualiza poco, no es necesario un plan de respaldo especialmente complejo (solamente que el jugador guarde su partida antes de salir del juego). Sin embargo, también se podría plantear, que la empresa distribuidora del juego permitiera autoguardados en la nube de las partidas de los distintos jugadores, por lo que si un jugador pierde su partida, o esta se corrompe pueda recuperarla fácilmente.
+
+<div style="page-break-before: always;"></div>
 
 ## Modelo Entidad Relación
 
@@ -108,17 +119,14 @@ erDiagram
 
     %% ENTIDADES
     JUGADOR {
-        int CodigoJugador PK
-        string Nombre
-        string Estadisticas
+        int codigoJugador PK
+        string nomJugador
     }
 
     CLASE {
         
         int CodigoClase PK
-        string NombreClase
-        string StatsBase
-        string ArmaBase
+        string nomClase
         
     }
     CLASE_GUERRERO {
@@ -132,52 +140,57 @@ erDiagram
         }
 
     OBJETO {
-        int CodigoObjeto PK
-        string NombreObjeto
-        string TipoObjeto
+        int codObjeto PK
+        string nomObjeto
+        string tipoObjeto
     }
     ESTADISTICAS {
-        int CodigoObjeto PK
+        int nivel PK
+        int fuerza
+        int destreza
+        int destreza
+        int arcano
+        int agilidad
+        int salud
     }
     EST_JUGADOR {
-        int CodigoObjeto PK, FK
+        int puntosHabilidad PK
     }
     INVENTARIO {
-        int CodigoJugador FK
+        int codigoJugador FK, PK
+        int codigoInventario PK
+        int codigoMapa FK, PK
     }
 
     
 
     ARMA {
-        int CodigoArma PK
-        int CodigoObjeto FK
+        int codigoArma PK
+        int codigoObjeto FK
         int Dano
-        int NivelMejora
     }
 
     COPIAS_ARMAS{
-        int CodigoArma PK
-        int NumCopias
+        int codigoArma PK
+        int numCopias
     }
 
 
     ENEMIGO {
-        int CodigoEnemigo PK
-        string Estadisticas
+        int codigoEnemigo PK
     }
 
     ENMBASICO {
-        int CodigoEnemigoBas PK
-        string Estadisticas
+        int codigoEnemigoBas PK
     }
 
     JEFE {
-        int CodigoJefe PK
-        string Estadisticas
+        int codigoJefe PK
     }
 
     MAPA {
-        int CodigoMapa PK
+        int codigoMapa PK
+        int codigoInventario FK
     }
 
 
@@ -198,7 +211,7 @@ erDiagram
     CLASE ||--|| CLASE_GUERRERO : es_tipo_de
     CLASE ||--|| CLASE_MAGO : es_tipo_de
     CLASE ||--|| CLASE_CABALLERO : es_tipo_de
-    CLASE ||--|| ARMAS : tiene
+    CLASE ||--|| ARMA : tiene
     JUGADOR ||--|| CLASE : elige
     ENEMIGO }|--|{ MAPA : aparece_en
     INVENTARIO ||--|| MAPA : tiene
@@ -210,12 +223,98 @@ erDiagram
     ENEMIGO ||--|| ENMBASICO : es_tipo_de
 
     JEFE ||--|| MAPA : es_unico_por
-    JUGADOR ||--o{ ENEMIGO : enfrenta
-    JUGADOR ||--|| JEFE : enfrenta
+    JUGADOR ||--|{ ENEMIGO : enfrenta
 
 
     
 ```
+<div style="page-break-before: always;"></div>
+
+## Modelo Relacional
+TABLA: JUGADOR
+- codigoJugador INT PK
+- nomJugador STRING
+
+TABLA: CLASE
+- codigoClase INT PK
+- nomClase STRING
+
+TABLA: CLASE_GUERRERO
+- id_guerrero INT PK FK CLASE
+
+TABLA: CLASE_MAGO
+- id_mago INT PK FK CLASE
+
+TABLA: CLASE_CABALLERO
+- id_caballero INT PK FK CLASE
+
+TABLA: OBJETO
+- codObjeto INT PK
+- nomObjeto STRING
+- tipoObjeto STRING
+
+TABLA: ESTADISTICAS
+- nivel INT PK
+- fuerza INT
+- destreza INT
+- arcano INT
+- agilidad INT
+- salud INT
+
+TABLA: EST_JUGADOR
+- puntosHabilidad INT PK
+- codigoJugador INT FK JUGADOR
+- nivelEstadistica INT FK ESTADISTICAS
+
+TABLA: INVENTARIO
+- codigoInventario INT PK
+- codigoJugador INT FK JUGADOR
+- codigoMapa INT FK MAPA
+
+TABLA: ARMA
+- codigoArma INT PK
+- codigoObjeto INT FK OBJETO
+- dano INT
+
+TABLA: COPIAS_ARMAS
+- codigoArma INT PK FK ARMA
+- numCopias INT
+
+TABLA: ENEMIGO
+- codigoEnemigo INT PK
+
+TABLA: ENMBASICO
+- codigoEnemigoBas INT PK FK ENEMIGO
+
+TABLA: JEFE
+- codigoJefe INT PK FK ENEMIGO
+- codigoMapa INT FK MAPA
+
+TABLA: MAPA
+- codigoMapa INT PK
+- codigoInventario INT FK INVENTARIO
+
+RELACIONES PRINCIPALES:
+- JUGADOR 1:1 EST_JUGADOR
+- EST_JUGADOR 1:1 ESTADISTICAS
+- JUGADOR 1:1 INVENTARIO
+- INVENTARIO 1:N OBJETO
+- ARMA 1:1 INVENTARIO
+- JUGADOR 1:N ARMA
+- JUGADOR 1:N OBJETO
+- COPIAS_ARMAS 1:1 ARMA
+- CLASE 1:1 ESTADISTICAS
+- CLASE 1:1 CLASE_GUERRERO / CLASE_MAGO / CLASE_CABALLERO
+- CLASE 1:N ARMA
+- JUGADOR 1:1 CLASE
+- ENEMIGO N:1 MAPA
+- INVENTARIO 1:1 MAPA
+- ENEMIGO N:M OBJETO
+- ENEMIGO 1:1 JEFE / ENMBASICO
+- JEFE 1:1 MAPA
+- JUGADOR 1:N ENEMIGO
+- JUGADOR 1:1 JEFE
+
 
 ## Bibliografía
 Parte de la información que hemos expuesto está en internet y otra en los apuntes de
