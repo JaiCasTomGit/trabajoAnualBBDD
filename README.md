@@ -33,7 +33,7 @@ Se quiere recoger información del jugador, jefes, ubicaciones del mapa, armas, 
 ### Funcionales
 
 1. Gestión de jugadores
-- El sistema debe permitir crear, modificar y eliminar jugadores con un CodigoJugador, Nombre y Estadisticas.
+- El sistema debe permitir crear, modificar y eliminar jugadores con un CodigoJugador, Nombre y estadisticasgit.
 - Cada jugador debe elegir una clase al ser creado.
 - Cada jugador debe tener su inventario y estadísticas asociadas.
 - Los jugadores pueden equipar armas y objetos.
@@ -120,72 +120,72 @@ erDiagram
     %% ENTIDADES
     JUGADOR {
         int codigoJugador PK
-        string nomJugador
+        string nombre
+        int nivel
+        int codigoClase FK
     }
 
     CLASE {
-        
-        int CodigoClase PK
+        int codigoClase PK
         string nomClase
-        
     }
-    CLASE_GUERRERO {
-        int CodigoClase PK, FK
-        int id_guerrero PK
-        }
-    CLASE_MAGO {
-        int CodigoClase PK, FK
-        int id_mago PK
-        }
-    CLASE_CABALLERO {
-        int CodigoClase PK, FK
-        int id_caballero PK
-        }
 
-    OBJETO {
-        int codObjeto PK
-        int codInventario PK, FK
-        string nomObjeto
-        string tipoObjeto
+    CLASE_GUERRERO {
+        int codigoClase PK, FK
     }
-    ESTADISTICAS {
-        int nivel PK
+
+    CLASE_MAGO {
+        int codigoClase PK, FK
+    }
+
+    CLASE_CABALLERO {
+        int codigoClase PK, FK
+    }
+
+    ESTADISTICAS_CLASE {
+        int codigoClase PK, FK
+        int fuerza_base
+        int destreza_base
+        int arcano_base
+        int agilidad_base
+        int salud_base
+    }
+
+    EST_JUGADOR {
+        int codigoJugador PK, FK
         int fuerza
-        int destreza
         int destreza
         int arcano
         int agilidad
         int salud
-    }
-    EST_JUGADOR {
-         int codigoJugador PK
-         int fuerza
-         int destreza
-         int arcano
-         int agilidad
-         int salud
-         int puntos_disponibles
-    }
-    INVENTARIO {
-        int codigoJugador FK, PK
-        int codigoInventario PK
-        int codigoMapa FK, PK
+        int puntos_disponibles
     }
 
-    
+    INVENTARIO {
+        int codigoInventario PK
+        string tipoInventario 
+        int codigoJugador FK 
+        int codigoMapa FK 
+    }
+
+    OBJETO {
+        int codObjeto PK
+        int codigoInventario FK
+        string nomObjeto
+        string tipoObjeto
+    }
 
     ARMA {
         int codigoArma PK
-        int codigoInventario PK, FK
-        int codigoObjeto PK, FK
-        int Dano
+        int codigoInventario FK
+        int codigoObjeto FK
+        int dano
     }
 
-    COPIAS_ARMAS{
+    COPIAS_ARMAS {
         int codigoArma PK, FK
-        int numCopias PK
+        int numCopias
     }
-
 
     ENEMIGO {
         int codigoEnemigo PK
@@ -193,44 +193,43 @@ erDiagram
 
     ENMBASICO {
         int codigoEnemigoBas PK
-        int codigoEnemigo PK, FK
+        int codigoEnemigo FK
     }
 
     JEFE {
         int codigoJefe PK
-        int codigoEnemigo PK, FK
+        int codigoEnemigo FK
     }
 
     MAPA {
         int codigoMapa PK
-        int codigoInventario PK, FK
     }
 
-
-
-
     %% RELACIONES
-    
+
     JUGADOR ||--|| EST_JUGADOR : tiene
-    ESTADISTICAS ||--|| EST_JUGADOR : basado_en
+    ESTADISTICAS_CLASE ||--|| EST_JUGADOR : basado_en
+
     JUGADOR ||--|| INVENTARIO : posee
-    INVENTARIO ||--|| OBJETO : es_tipo_de
-    ARMA ||--|| INVENTARIO : es_tipo_de
+    MAPA ||--|| INVENTARIO : tiene
+
+    INVENTARIO ||--|| OBJETO : contiene
+    INVENTARIO ||--|| ARMA : contiene
+
     JUGADOR ||--o{ ARMA : puede_equipar
     JUGADOR ||--o{ OBJETO : puede_equipar
 
     COPIAS_ARMAS }|--|| ARMA : depende_de
-    CLASE ||--|| ESTADISTICAS : tiene
+
+    CLASE ||--|| ESTADISTICAS_CLASE : tiene
     CLASE ||--|| CLASE_GUERRERO : es_tipo_de
     CLASE ||--|| CLASE_MAGO : es_tipo_de
     CLASE ||--|| CLASE_CABALLERO : es_tipo_de
     CLASE ||--|| ARMA : tiene
     JUGADOR ||--|| CLASE : elige
+
     ENEMIGO }|--|{ MAPA : aparece_en
-    INVENTARIO ||--|| MAPA : tiene
     ENEMIGO }o--o{ OBJETO : suelta
-    
-    
 
     ENEMIGO ||--|| JEFE : es_tipo_de
     ENEMIGO ||--|| ENMBASICO : es_tipo_de
@@ -279,7 +278,7 @@ TABLA: OBJETO
 - nomObjeto
 - tipoObjeto
 
-TABLA: ESTADISTICAS
+TABLA: ESTADISTICAS_CLASE
 - nivel PK
 - fuerza 
 - destreza 
@@ -321,14 +320,14 @@ TABLA: MAPA
 
 RELACIONES PRINCIPALES:
 - JUGADOR 1:1 EST_JUGADOR
-- EST_JUGADOR 1:1 ESTADISTICAS
+- EST_JUGADOR 1:1 ESTADISTICAS_CLASE
 - JUGADOR 1:1 INVENTARIO
 - INVENTARIO 1:N OBJETO
 - ARMA 1:1 INVENTARIO
 - JUGADOR 1:N ARMA
 - JUGADOR 1:N OBJETO
 - COPIAS_ARMAS 1:1 ARMA
-- CLASE 1:1 ESTADISTICAS
+- CLASE 1:1 ESTADISTICAS_CLASE
 - CLASE 1:1 CLASE_GUERRERO / CLASE_MAGO / CLASE_CABALLERO
 - CLASE 1:N ARMA
 - JUGADOR 1:1 CLASE
