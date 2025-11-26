@@ -158,8 +158,13 @@ erDiagram
         int salud
     }
     EST_JUGADOR {
-        int puntosHabilidad PK
-        int nivel PK, FK
+         int codigoJugador PK
+         int fuerza
+         int destreza
+         int arcano
+         int agilidad
+         int salud
+         int puntos_disponibles
     }
     INVENTARIO {
         int codigoJugador FK, PK
