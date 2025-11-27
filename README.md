@@ -17,7 +17,8 @@
         - [Crecimiento](#crecimiento)
         - [Plan de respaldo](#plan-de-respaldo)
 3. [Bibliografía](#bibliografía)
-
+4. [Modelo Entidad Relación](#modelo-entidad-relación)
+5. [Modelo Relacional](#modelo-relacional)
 <div style="page-break-before: always;"></div>
 
 ## Descripción del Sistema
