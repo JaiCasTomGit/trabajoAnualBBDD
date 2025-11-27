@@ -16,9 +16,9 @@
         - [Ubicación de los datos o Almacenamiento Físico](#ubicación-de-los-datos-o-almacenamiento-físico)
         - [Crecimiento](#crecimiento)
         - [Plan de respaldo](#plan-de-respaldo)
-3. [Bibliografía](#bibliografía)
-4. [Modelo Entidad Relación](#modelo-entidad-relación)
-5. [Modelo Relacional](#modelo-relacional)
+3. [Modelo Entidad Relación](#modelo-entidad-relación)
+4. [Modelo Relacional](#modelo-relacional)
+5. [Bibliografía](#bibliografía)
 <div style="page-break-before: always;"></div>
 
 ## Descripción del Sistema
