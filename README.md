@@ -1,11 +1,8 @@
-
-# Bases de Datos 
+## Bases de Datos 
 ## Proyecto Anual Segunda Entrega
-
+<img src="portada.jpg">
 
 ##### Hecho por Jaime Castro y José Miguel Cenoz, 1ºDAW
-
-<div style="page-break-before: always;"></div>
 
 
 ## Índice
