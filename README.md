@@ -27,50 +27,61 @@
 Una compañía de videojuegos ha desarrollado un juego en el que se controla un personaje y tienes que derrotar distintos jefes, ubicados en el mapa del juego. 
 Se quiere recoger información del jugador, jefes, ubicaciones del mapa, armas, objetos y enemigos básicos.
 
-<div style="page-break-before: always;"></div>
-
 ## Requisitos del sistema
 ### Funcionales
 
+- Se debe mantener la integridad referencial entre todas las entidades mediante claves primarias y foráneas, incluyendo herencias y tipos especializados.
+
 1. Gestión de jugadores
-- El sistema debe permitir crear, modificar y eliminar jugadores con un CodigoJugador, Nombre y estadisticasgit.
-- Cada jugador debe elegir una clase al ser creado.
+- El sistema debe permitir crear, consultar, modificar y eliminar jugadores, cada uno identificado por un código único (codigoJugador).
+- Cada jugador debe tener asociada una clase (CLASE) y estadísticas propias basadas en las estadísticas de la clase.
 - Cada jugador debe tener su inventario y estadísticas asociadas.
 - Los jugadores pueden equipar armas y objetos.
 
 2. Clases y especializaciones
-- El sistema debe manejar distintas clases de personaje.
-- Cada clase tiene estadísticas base y un arma base.
-- Las clases pueden ser especializadas en Guerrero, Mago o Caballero.
+- El sistema debe diferenciar entre las clases Guerrero, Mago y Caballero como tipos especializados de clase.
+- Cada clase debe tener estadísticas base (ESTADISTICAS_CLASE) que se utilicen para calcular las estadísticas del jugador.
 - Cada jugador puede tener solo una clase activa, aunque la clase puede no tener jugadores asignados.
+
+<div style="page-break-before: always;"></div>
 
 3. Objetos y armas
 - El sistema debe permitir crear y gestionar objetos con CodigoObjeto, NombreObjeto y TipoObjeto.
 - Cada arma debe estar vinculada a un objeto base y tener atributos como Dano y NivelMejora.
+- El sistema debe garantizar que cada arma y objeto en un inventario esté correctamente referenciado y no se duplique indebidamente.
 - El sistema debe controlar las copias de armas disponibles en el juego.
-- Los jugadores pueden equipar objetos y armas, y estos pueden estar almacenados en el inventario.
+- Los jugadores deben poder equipar objetos y armas de su inventario.
+
+
 
 4. Estadísticas
 - Los jugadores y las clases deben tener estadísticas asociadas.
 - Las estadísticas deben reflejar atributos base de la clase o mejoras obtenidas por objetos.
+- El sistema debe calcular y actualizar las estadísticas del jugador al equipar objetos o subir de nivel, respetando los valores base de la clase.
 
 5. Enemigos y jefes
 - El sistema debe permitir crear enemigos y diferenciarlos en jefes y enemigos básicos.
-- Cada enemigo puede soltar objetos.
-- Los enemigos y jefes aparecen en mapas específicos.
-- Cada jugador puede enfrentarse a enemigos y jefes.
+- El sistema debe permitir crear enemigos (ENEMIGO) que puedan aparecer en mapas y soltar objetos al ser derrotados.
+- Algunos enemigos pueden ser jefes (JEFE), y cada jefe es un enemigo único por mapa.
+- El sistema debe diferenciar enemigos básicos (ENMBASICO) de jefes, manteniendo la relación jerárquica con la tabla de enemigos.
+- Las relaciones jerárquicas y de especialización entre clases, enemigos y jefes deben estar reflejadas y respetadas en todas las operaciones del sistema.
+- Los jugadores deben poder enfrentarse ante enemigos presentes en los mapas.
 
 6. Mapas
+- Cada mapa debe tener un inventario asociado con botín específico que los jugadores pueden recoger.
 - Cada mapa debe contener un inventario y enemigos.
 - Cada jefe es único por mapa.
 - El sistema debe poder listar enemigos y jefes que aparecen en un mapa determinado.
 
+<div style="page-break-before: always;"></div>
+
 7. Inventario
-- El inventario debe asociarse a un jugador y a un mapa.
+- Los jugadores deben poder tener inventarios de tipo “jugador” y acceder al botín de los mapas a través de inventarios de tipo “mapa”.
+- Cada inventario debe contener objetos (OBJETO) y armas (ARMA), y cada arma puede depender de múltiples copias (COPIAS_ARMAS).
+- Se debe permitir consultar el contenido de cualquier inventario, diferenciando entre inventario de jugador e inventario de mapa.
 - Debe permitir almacenar objetos y armas.
 - Debe reflejar qué objetos y armas están actualmente equipados por el jugador.
 
-<div style="page-break-before: always;"></div>
 
 ### No funcionales
 Se ha seleccionado para esta tarea, una base de datos relacional, ya que los datos de un videojuego, mantienen una relación natural entre entidades participantes del medio.
@@ -78,6 +89,8 @@ Se ha seleccionado para esta tarea, una base de datos relacional, ya que los dat
 Se hacen referencias constantes entre tablas, por ejemplo transacciones o reglas (enemigo no deja arma si no es eliminado por jugador, por ejemplo). 
 
 Usando el modelo relacional es posible conseguir diseño, integridad y consultas. Siendo estas últimas un método eficiente para recuperar información sobre la experiencia, por ejemplo si hay zonas demasiado diİciles, comparando las veces que el jugador ha sido eliminado en una zona concreta, cuáles son las armas mas usadas etc.
+
+<div style="page-break-before: always;"></div>
 
 #### Estudio _SGBD_ a usar
 Hay varias opciones a la hora de seleccionar el _SGBD_ que más nos convene para este sistema de información. Entre ellos hemos seleccionado `MySQL`, `SQLite`, `PostgreSQL` y `Oracle`.
@@ -91,18 +104,16 @@ Hay varias opciones a la hora de seleccionar el _SGBD_ que más nos convene para
 
 En conclusión, por todo lo anteriormente descrito, nos decantamos por usar el _SGBD_ de **`PostgreSQL`**; por su capacidad de personalización, manejo de `JSON/CTE`, gran uso multiplataforma etc.
 
-<div style="page-break-before: always;"></div>
-
 #### Funcionamiento de BBDD distribuida
 Esta _BBDD_  funcionaría en una distribuida, aunque no tendría sentido más allá de la seguridad de la información, ya que la _BBDD_ se ejecutaría en la máquina personal del jugador. Sin embargo, si se tratará de un juego en línea, dónde las actualizaciones son constantes, podría ser preferible, para que la máquina del jugador no tenga que ejecutar dicha _BBDD_, puesto que pueden llegar a alcanzar tamaños enormes.
+
+<div style="page-break-before: always;"></div>
 
 #### Ubicación de los datos o Almacenamiento Físico
 La empresa tendría un servidor central para ubicar la base de datos principal del juego, en el que se guardarían absolutamente todos los datos de la misma. Cada jugador tendría su propia copia del mismo, pero con los datos actualizados de su partida. 
 Si se hiciera alguna actualización del juego, sería mediante un _script_ de migración, que en resumen es un _script_ _SQL_ que sirve para hacer cambios en una base de datos de forma segura (en el transcurso de actualizaciones). 
 Esto se haría en caso de que se añada o elimine algún arma del juego, o para contenido extra del juego.
 Cabe mencionar que se puede dar el caso de que haya un riesgo de incompatibilidad de versión, si un jugador no actualiza el juego cuando se distribuya una actualización, su _BBDD_ quedaría desactualizada, por lo que los datos podrían no coincidir con la versión que se publica, o parche actual de la empresa.
-
-<div style="page-break-before: always;"></div>
 
 #### Crecimiento
 No se prevé un gran crecimiento de esta base de datos, sin embargo, si la compañía desea hacer actualizaciones o ampliaciones de contenido (como contenido descargable, o una continuación del mismo). Se podría usar esta _BBDD_ de plantilla.
@@ -330,16 +341,21 @@ erDiagram
 | MAPA | |
 |--------------|------------|
 | codigoMapa | PK |
-
+<div style="page-break-before: always;"></div>
 
 ## Bibliografía
 Parte de la información que hemos expuesto está en internet y otra en los apuntes de
 clase, las fuentes son las siguientes:
+
 - https://www.red-gate.com/blog/a-database-model-for-action-games?.com
-- https://learn.microsoŌ.com/en-us/sql/relational-databases/databases/estimate-the-size-of-a-database?view=sql-server-ver17
+
+- https://learn.microsoft.com/en-us/sql/relational-databases/databases/estimate-the-size-of-a-database?view=sql-server-ver17
+
 - http://Postgresql.org
--  https://docs.aws.amazon.com/wellarchitected/latest/games-industry-
-- lens/games-scenario-4.html?.com
+
+- https://docs.aws.amazon.com/wellarchitected/latest/games-industry-lens/games-scenario-4.html?.com
+
 - https://knowledgebase.apexsql.com/migration-scripts-introduction-and-general-review/?_x_tr_sl&_x_tr_tl&_x_tr_hl
+
 También dejamos acceso a información sobre el juego en el que nos hemos basado para contrastar información sobre el trabajo que estamos realizando.
-- https://darksouls.fandom.com/es/wiki/Dark_Souls_III
+- https://darksouls.fandom.com/es/wiki/Dark_Souls_III 
