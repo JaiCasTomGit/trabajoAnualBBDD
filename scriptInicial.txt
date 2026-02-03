@@ -1,0 +1,134 @@
+Estos son los scripts que hemos generado incialmente que hay que modificar:
+
+-- TABLAS BASE PARA SCRIPT 1 JUGADORES, CLASES Y ESTADISITCAS. De este se encarga Jaime.
+CREATE TABLE CLASE (
+    codigoClase INT PRIMARY KEY,
+    nomClase VARCHAR(100)
+);
+
+CREATE TABLE JUGADOR (
+    codigoJugador INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    nivel INT,
+    codigoClase INT,
+    CONSTRAINT fk_jugador_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE ESTADISTICAS_CLASE (
+    codigoClase INT PRIMARY KEY,
+    fuerza_base INT,
+    destreza_base INT,
+    arcano_base INT,
+    agilidad_base INT,
+    salud_base INT,
+    CONSTRAINT fk_estadisticas_clase_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE CLASE_GUERRERO (
+    codigoClase INT PRIMARY KEY,
+    CONSTRAINT fk_guerrero_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE CLASE_MAGO (
+    codigoClase INT PRIMARY KEY,
+    CONSTRAINT fk_mago_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE CLASE_CABALLERO (
+    codigoClase INT PRIMARY KEY,
+    CONSTRAINT fk_caballero_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE EST_JUGADOR (
+    codigoJugador INT PRIMARY KEY,
+    fuerza INT,
+    destreza INT,
+    arcano INT,
+    agilidad INT,
+    salud INT,
+    puntos_disponibles INT,
+    CONSTRAINT fk_est_jugador FOREIGN KEY (codigoJugador)
+        REFERENCES JUGADOR(codigoJugador)
+);
+
+
+-- TABLAS BASE PARA SCRIPT 2 INVENTARIO, OBJETOS Y ENEMIGOS. De este se encarga Josemi.
+CREATE TABLE CLASE (
+    codigoClase INT PRIMARY KEY,
+    nomClase VARCHAR(100)
+);
+
+CREATE TABLE JUGADOR (
+    codigoJugador INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    nivel INT,
+    codigoClase INT,
+    CONSTRAINT fk_jugador_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+CREATE TABLE MAPA (
+    codigoMapa INT PRIMARY KEY
+);
+
+CREATE TABLE ENEMIGO (
+    codigoEnemigo INT PRIMARY KEY
+);
+
+-- TABLAS DEPENDIENTES DE INVENTARIO Y OBJETOS
+CREATE TABLE INVENTARIO (
+    codigoInventario INT PRIMARY KEY,
+    tipoInventario VARCHAR(50),
+    codigoJugador INT,
+    codigoMapa INT,
+    CONSTRAINT fk_inventario_jugador FOREIGN KEY (codigoJugador)
+        REFERENCES JUGADOR(codigoJugador),
+    CONSTRAINT fk_inventario_mapa FOREIGN KEY (codigoMapa)
+        REFERENCES MAPA(codigoMapa)
+);
+
+CREATE TABLE OBJETO (
+    codObjeto INT PRIMARY KEY,
+    codigoInventario INT,
+    nomObjeto VARCHAR(100),
+    tipoObjeto VARCHAR(50),
+    CONSTRAINT fk_objeto_inventario FOREIGN KEY (codigoInventario)
+        REFERENCES INVENTARIO(codigoInventario)
+);
+
+CREATE TABLE ARMA (
+    codigoArma INT PRIMARY KEY,
+    codigoInventario INT,
+    codigoObjeto INT,
+    dano INT,
+    CONSTRAINT fk_arma_inventario FOREIGN KEY (codigoInventario)
+        REFERENCES INVENTARIO(codigoInventario),
+    CONSTRAINT fk_arma_objeto FOREIGN KEY (codigoObjeto)
+        REFERENCES OBJETO(codObjeto)
+);
+
+CREATE TABLE COPIAS_ARMAS (
+    codigoArma INT PRIMARY KEY,
+    numCopias INT,
+    CONSTRAINT fk_copias_armas FOREIGN KEY (codigoArma)
+        REFERENCES ARMA(codigoArma)
+);
+
+CREATE TABLE ENMBASICO (
+    codigoEnemigoBas INT PRIMARY KEY,
+    codigoEnemigo INT,
+    CONSTRAINT fk_enmbasico_enemigo FOREIGN KEY (codigoEnemigo)
+        REFERENCES ENEMIGO(codigoEnemigo)
+);
+
+CREATE TABLE JEFE (
+    codigoJefe INT PRIMARY KEY,
+    codigoEnemigo INT,
+    CONSTRAINT fk_jefe_enemigo FOREIGN KEY (codigoEnemigo)
+        REFERENCES ENEMIGO(codigoEnemigo)
+);
