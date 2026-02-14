@@ -1,0 +1,65 @@
+CREATE TABLE CLASE (
+    codigoClase number (3) PRIMARY KEY,
+    nomClase VARCHAR2(20)
+);
+
+CREATE TABLE JUGADOR (
+    codigoJugador number (3) PRIMARY KEY,
+    nombre VARCHAR2(40),
+    nivel number(2),
+    codigoClase number(3),
+    CONSTRAINT fk_jugador_clase FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+-- TABLA ESTADISTICAS_CLASE
+CREATE TABLE ESTADISTICAS_CLASE (
+    codigoClase NUMBER(3) PRIMARY KEY,
+    fuerza_base NUMBER(3),
+    destreza_base NUMBER(3),
+    arcano_base NUMBER(3),
+    agilidad_base NUMBER(3),
+    salud_base NUMBER(3),
+    CONSTRAINT fk_estadisticas_clase_clase
+        FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+-- TABLA CLASE_GUERRERO
+CREATE TABLE CLASE_GUERRERO (
+    codigoClase NUMBER(3) PRIMARY KEY,
+    CONSTRAINT fk_guerrero_clase
+        FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+-- TABLA CLASE_MAGO
+CREATE TABLE CLASE_MAGO (
+    codigoClase NUMBER(3) PRIMARY KEY,
+    CONSTRAINT fk_mago_clase
+        FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+-- TABLA CLASE_CABALLERO
+CREATE TABLE CLASE_CABALLERO (
+    codigoClase NUMBER(3) PRIMARY KEY,
+    CONSTRAINT fk_caballero_clase
+        FOREIGN KEY (codigoClase)
+        REFERENCES CLASE(codigoClase)
+);
+
+-- TABLA EST_JUGADOR
+CREATE TABLE EST_JUGADOR (
+    codigoJugador NUMBER(3) PRIMARY KEY,
+    fuerza NUMBER(3),
+    destreza NUMBER(3),
+    arcano NUMBER(3),
+    agilidad NUMBER(3),
+    salud NUMBER(3),
+    puntos_disponibles NUMBER(3),
+    nivel NUMBER(2),
+    CONSTRAINT fk_est_jugador
+        FOREIGN KEY (codigoJugador)
+        REFERENCES JUGADOR(codigoJugador)
+);
