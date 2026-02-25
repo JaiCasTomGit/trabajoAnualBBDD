@@ -1,3 +1,26 @@
+## Bases de Datos
+## Proyecto Anual Tercera Entrega
+###### Hecho por Jaime Castro y José Miguel Cenoz, 1ºDAW
+<img src="portadaE3.png">
+
+#
+#
+#
+#
+## Índice
+
+1. [Modelo Entidad Relación](#modelo-entidad-relación)
+    - [Resumen de modificaciones realizadas](#resumen-de-modificaciones-realizadas)
+
+2. [Modelo Relacional](#modelo-relacional)
+    - [Notas sobre el modelo relacional](#notas-sobre-el-modelo-relacional)
+
+3. [Modelo Físico, Inserts y Selects](#modelo-físico-inserts-y-selects)
+    - [Usuario](#usuario)
+    - [Tablas Físicas](#tablas-físicas-6-destacadas)
+    - [Inserts](#inserts)
+    - [Selects](#5-select-de-distinta-complejidad)
+
 ## Modelo Entidad Relación
 
 ```mermaid
@@ -290,7 +313,9 @@ erDiagram
 - Se introduce `ITEM` como entidad base del sistema de inventario  
 - INVENTARIO pasa a contener ITEM y no directamente ARMA u OBJETO_USABLE  
 - Se evita redundancia estructural entre tipos de objetos  
-
+#
+#
+#
 #### 2. Especialización total y exclusiva de ITEM
 - Todo ITEM debe ser obligatoriamente:
   - ARMA  
@@ -448,15 +473,18 @@ Con esto el modelo queda consistente en especialización, normalización y contr
 # MODELO FÍSICO, INSERTS Y SELECTS
 
 ## USUARIO
+```sql
 -- COMENTARIO: creación de usuario y permisos
 CREATE USER proyecto IDENTIFIED BY password;
 GRANT CONNECT, RESOURCE TO proyecto;
 
 ---
+```
 
 ## TABLAS FÍSICAS (6 destacadas)
 
 ### ITEM
+```sql
 -- COMENTARIO: Representa cualquier objeto del inventario, puede ser ARMA o OBJETO_USABLE
 CREATE TABLE ITEM (
     codItem NUMBER(3) PRIMARY KEY,
@@ -466,8 +494,9 @@ CREATE TABLE ITEM (
     CONSTRAINT fk_item_inventario FOREIGN KEY (codigoInventario)
         REFERENCES INVENTARIO(codigoInventario)
 );
-
+```
 ### ARMA
+```sql
 -- COMENTARIO: Especialización total de ITEM
 CREATE TABLE ARMA (
     codItem NUMBER(3) PRIMARY KEY,
@@ -475,8 +504,9 @@ CREATE TABLE ARMA (
     CONSTRAINT fk_arma_item FOREIGN KEY (codItem)
         REFERENCES ITEM(codItem)
 );
-
+```
 ### COPIAS_ARMAS
+```sql
 -- COMENTARIO: Cantidad de copias de cada arma
 CREATE TABLE COPIAS_ARMAS (
     codItem NUMBER(3) PRIMARY KEY,
@@ -484,8 +514,9 @@ CREATE TABLE COPIAS_ARMAS (
     CONSTRAINT fk_copias_armas FOREIGN KEY (codItem)
         REFERENCES ARMA(codItem)
 );
-
+```
 ### INVENTARIO
+```sql
 -- COMENTARIO: Puede pertenecer a un jugador o a un mapa (XOR)
 CREATE TABLE INVENTARIO (
     codigoInventario NUMBER(3) PRIMARY KEY,
@@ -501,15 +532,17 @@ CREATE TABLE INVENTARIO (
         (codigoJugador IS NULL AND codigoMapa IS NOT NULL)
     )
 );
-
+```
 ### ENEMIGO
+```sql
 -- COMENTARIO: Representa todos los enemigos con nombre
 CREATE TABLE ENEMIGO (
     codigoEnemigo NUMBER(3) PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL
 );
-
+```
 ### DROP_ENEMIGO_ITEM
+```sql
 -- COMENTARIO: Relación N:M entre ENEMIGO y ITEM
 CREATE TABLE DROP_ENEMIGO_ITEM (
     codigoEnemigo NUMBER(3) NOT NULL,
@@ -523,10 +556,11 @@ CREATE TABLE DROP_ENEMIGO_ITEM (
 );
 
 ---
-
+```
 ## INSERTS (al menos 10 por tabla)
 
 -- CLASE
+```sql
 INSERT INTO CLASE VALUES (1,'Guerrero');
 INSERT INTO CLASE VALUES (2,'Mago');
 INSERT INTO CLASE VALUES (3,'Arquero');
@@ -537,8 +571,9 @@ INSERT INTO CLASE VALUES (7,'Nigromante');
 INSERT INTO CLASE VALUES (8,'Berserker');
 INSERT INTO CLASE VALUES (9,'Druida');
 INSERT INTO CLASE VALUES (10,'Monje');
-
+```
 -- JUGADOR
+```sql
 INSERT INTO JUGADOR VALUES (1,'Aldric',15,1);
 INSERT INTO JUGADOR VALUES (2,'Selene',20,2);
 INSERT INTO JUGADOR VALUES (3,'Kael',18,3);
@@ -549,8 +584,9 @@ INSERT INTO JUGADOR VALUES (7,'Drake',25,7);
 INSERT INTO JUGADOR VALUES (8,'Ragnar',35,8);
 INSERT INTO JUGADOR VALUES (9,'Eira',16,9);
 INSERT INTO JUGADOR VALUES (10,'Zane',19,10);
-
+```
 -- ITEM
+```sql
 INSERT INTO ITEM VALUES (1,1,'Espada basica','ARMA');
 INSERT INTO ITEM VALUES (2,2,'Baculo magico','ARMA');
 INSERT INTO ITEM VALUES (3,3,'Arco largo','ARMA');
@@ -561,8 +597,9 @@ INSERT INTO ITEM VALUES (7,7,'Pocion mana','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (8,8,'Pergamino','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (9,9,'Bomba','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (10,10,'Anillo fuerza','OBJETO_USABLE');
-
+```
 -- ARMA
+```sql
 INSERT INTO ARMA VALUES (1,50);
 INSERT INTO ARMA VALUES (2,70);
 INSERT INTO ARMA VALUES (3,60);
@@ -573,8 +610,9 @@ INSERT INTO ARMA VALUES (7,65);
 INSERT INTO ARMA VALUES (8,75);
 INSERT INTO ARMA VALUES (9,50);
 INSERT INTO ARMA VALUES (10,90);
-
+```
 -- COPIAS_ARMAS
+```sql
 INSERT INTO COPIAS_ARMAS VALUES (1,2);
 INSERT INTO COPIAS_ARMAS VALUES (2,1);
 INSERT INTO COPIAS_ARMAS VALUES (3,3);
@@ -585,8 +623,9 @@ INSERT INTO COPIAS_ARMAS VALUES (7,1);
 INSERT INTO COPIAS_ARMAS VALUES (8,3);
 INSERT INTO COPIAS_ARMAS VALUES (9,2);
 INSERT INTO COPIAS_ARMAS VALUES (10,1);
-
+```
 -- ENEMIGO
+```sql
 INSERT INTO ENEMIGO VALUES (1,'Goblin');
 INSERT INTO ENEMIGO VALUES (2,'Orco');
 INSERT INTO ENEMIGO VALUES (3,'Esqueleto');
@@ -597,8 +636,9 @@ INSERT INTO ENEMIGO VALUES (7,'Araña gigante');
 INSERT INTO ENEMIGO VALUES (8,'Dragón pequeño');
 INSERT INTO ENEMIGO VALUES (9,'Murciélago');
 INSERT INTO ENEMIGO VALUES (10,'Slime');
-
+```
 -- DROP_ENEMIGO_ITEM
+```sql
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (1,1,100);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (1,6,50);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (2,2,100);
@@ -618,36 +658,48 @@ INSERT INTO DROP_ENEMIGO_ITEM VALUES (10,5,20);
 COMMIT;
 
 ---
+```
 
 ## 5 SELECT DE DISTINTA COMPLEJIDAD
 
 -- 1. SELECT simple: jugadores con su clase
+
+```sql
 SELECT j.nombre, c.nomClase
 FROM JUGADOR j
 JOIN CLASE c ON j.codigoClase = c.codigoClase;
+```
 
 -- 2. SELECT con JOIN múltiple: armas de cada jugador
+```sql
 SELECT j.nombre, i.nomItem, a.dano
 FROM JUGADOR j
 JOIN INVENTARIO inv ON j.codigoJugador = inv.codigoJugador
 JOIN ITEM i ON inv.codigoInventario = i.codigoInventario
 JOIN ARMA a ON i.codItem = a.codItem;
+```
 
 -- 3. SELECT con agregación: total armas por jugador
+```sql
 SELECT j.nombre, COUNT(a.codItem) AS total_armas
 FROM JUGADOR j
 JOIN INVENTARIO inv ON j.codigoJugador = inv.codigoJugador
 JOIN ITEM i ON inv.codigoInventario = i.codigoInventario
 JOIN ARMA a ON i.codItem = a.codItem
 GROUP BY j.nombre;
+```
 
 -- 4. SELECT con condición: enemigos con drop >50%
+```sql
 SELECT e.nombre, d.codItem, d.probabilidad
 FROM ENEMIGO e
 JOIN DROP_ENEMIGO_ITEM d ON e.codigoEnemigo = d.codigoEnemigo
 WHERE d.probabilidad > 50;
+```
 
 -- 5. SELECT con subconsulta: jugadores con nivel superior al promedio
+```sql
 SELECT nombre, nivel
 FROM JUGADOR
 WHERE nivel > (SELECT AVG(nivel) FROM JUGADOR);
+```
