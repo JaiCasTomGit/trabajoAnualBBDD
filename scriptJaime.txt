@@ -1,3 +1,5 @@
+
+
 CREATE TABLE CLASE (
     codigoClase number (3) PRIMARY KEY,
     nomClase VARCHAR2(20)

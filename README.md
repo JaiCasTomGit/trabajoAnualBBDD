@@ -249,6 +249,214 @@ erDiagram
 
     
 ```
+```mermaid
+erDiagram
+
+    %% =========================
+    %% ENTIDADES PRINCIPALES
+    %% =========================
+
+    JUGADOR {
+        int codigoJugador PK
+        string nombre
+        int nivel
+        int codigoClase FK
+    }
+
+    CLASE {
+        int codigoClase PK
+        string nomClase
+    }
+
+    %% Especialización de CLASE
+    CLASE_GUERRERO {
+        int codigoClase PK, FK
+    }
+
+    CLASE_MAGO {
+        int codigoClase PK, FK
+    }
+
+    CLASE_CABALLERO {
+        int codigoClase PK, FK
+    }
+
+    ESTADISTICAS_CLASE {
+        int codigoClase PK, FK
+        int fuerza_base
+        int destreza_base
+        int arcano_base
+        int agilidad_base
+        int salud_base
+    }
+
+    EST_JUGADOR {
+        int codigoJugador PK, FK
+        int fuerza
+        int destreza
+        int arcano
+        int agilidad
+        int salud
+        int puntos_disponibles
+    }
+
+    MAPA {
+        int codigoMapa PK
+    }
+
+    %% =========================
+    %% INVENTARIO (contenedor)
+    %% =========================
+
+    INVENTARIO {
+        int codigoInventario PK
+        string tipoInventario
+        int codigoJugador FK
+        int codigoMapa FK
+        %% NOTA: Restricción XOR (Jugador O Mapa)
+    }
+
+    %% =========================
+    %% ITEM (especialización total y disjunta)
+    %% =========================
+
+    ITEM {
+        int codItem PK
+        int codigoInventario FK
+        string nombre
+        string tipoItem
+    }
+
+    ARMA {
+        int codItem PK, FK
+        int dano
+    }
+
+    OBJETO_USABLE {
+        int codItem PK, FK
+        string efecto
+    }
+
+    COPIAS_ARMAS {
+        int codItem PK, FK
+        int numCopias
+    }
+
+    %% =========================
+    %% ENEMIGOS (especialización total y disjunta)
+    %% =========================
+
+    ENEMIGO {
+        int codigoEnemigo PK
+        string nombre
+    }
+
+    JEFE {
+        int codigoEnemigo PK, FK
+    }
+
+    ENMBASICO {
+        int codigoEnemigo PK, FK
+    }
+
+    %% =========================
+    %% ENTIDADES INTERMEDIAS (N:M)
+    %% =========================
+
+    ENEMIGO_MAPA {
+        int codigoEnemigo PK, FK
+        int codigoMapa PK, FK
+    }
+
+    DROP_ENEMIGO_ITEM {
+        int codigoEnemigo PK, FK
+        int codItem PK, FK
+    }
+
+    %% =========================
+    %% RELACIONES
+    %% =========================
+
+    JUGADOR ||--|| EST_JUGADOR : tiene
+
+    CLASE ||--o{ JUGADOR : es_elegida_por
+    CLASE ||--|| ESTADISTICAS_CLASE : tiene
+
+    CLASE ||--|| CLASE_GUERRERO : es_tipo_de
+    CLASE ||--|| CLASE_MAGO : es_tipo_de
+    CLASE ||--|| CLASE_CABALLERO : es_tipo_de
+
+    JUGADOR ||--|| INVENTARIO : posee
+    MAPA ||--|| INVENTARIO : contiene
+
+    INVENTARIO ||--o{ ITEM : guarda
+
+    ITEM ||--|| ARMA : es_tipo_de
+    ITEM ||--|| OBJETO_USABLE : es_tipo_de
+
+    ARMA ||--o| COPIAS_ARMAS : puede_tener
+
+    ENEMIGO ||--|| JEFE : es_tipo_de
+    ENEMIGO ||--|| ENMBASICO : es_tipo_de
+
+    ENEMIGO ||--o{ ENEMIGO_MAPA : aparece
+    MAPA ||--o{ ENEMIGO_MAPA : contiene
+
+    ENEMIGO ||--o{ DROP_ENEMIGO_ITEM : suelta
+    ITEM ||--o{ DROP_ENEMIGO_ITEM : puede_caer
+
+    JUGADOR ||--o{ ENEMIGO : enfrenta
+```
+# Resumen de modificaciones realizadas
+
+## 1. Creación de ITEM como entidad intermedia
+- Se introduce `ITEM` como entidad base del sistema de inventario  
+- INVENTARIO pasa a contener ITEM y no directamente ARMA u OBJETO_USABLE  
+- Se evita redundancia estructural entre tipos de objetos  
+
+## 2. Especialización total y exclusiva de ITEM
+- Todo ITEM debe ser obligatoriamente:
+  - ARMA  
+  - OBJETO_USABLE  
+- No puede existir un ITEM genérico sin subtipo  
+- Se aplica restricción conceptual XOR (disyunta y total)
+
+## 3. ARMA pasa a ser especialización real
+- PK compartida (`codItem`)  
+- Se elimina cualquier clave artificial propia  
+- Hereda identidad directamente de ITEM  
+
+## 4. OBJETO_USABLE pasa a ser especialización real
+- PK compartida (`codItem`)  
+- Hereda identidad directamente de ITEM  
+
+## 5. COPIAS_ARMAS
+- Se mantiene como entidad independiente  
+- Depende de ARMA mediante PK compartida (`codItem`)  
+- Permite modelar número de copias sin duplicar armas  
+
+## 6. ENEMIGO
+- Se añade el atributo `nombre`  
+- Mejora la coherencia semántica del modelo  
+
+## 7. JEFE y ENMBASICO
+- Se mantienen como especializaciones reales  
+- PK compartida con ENEMIGO  
+- Especialización disyunta  
+
+## 8. Relación de drop corregida
+- Se elimina relación directa ENEMIGO ↔ ITEM  
+- Se introduce entidad asociativa `DROP_ENEMIGO_ITEM`  
+- Se modela correctamente la relación N:M  
+
+## 9. Restricción conceptual mantenida
+- Se mantiene restricción XOR en INVENTARIO  
+  (Pertenece a jugador **o** a mapa)
+
+---
+
+Con esto el modelo queda consistente en especialización, normalización y control de restricciones estructurales.
+
 <div style="page-break-before: always;"></div>
 
 ## Modelo Relacional
@@ -302,43 +510,62 @@ erDiagram
 | codigoJugador    | FK |
 | codigoMapa       | FK |
 
-| OBJETO | |
+| ITEM | |
 |--------------|------------|
-| codObjeto        | PK |
+| codItem          | PK |
 | codigoInventario | FK |
-| nomObjeto        |    |
-| tipoObjeto       |    |
+| nomItem          |    |
+| tipoItem         |    |
 
 | ARMA | |
 |--------------|------------|
-| codigoArma      | PK |
-| codigoInventario| FK |
-| codigoObjeto    | FK |
-| dano            |    |
+| codItem       | PK, FK |
+| dano          |    |
+
+| OBJETO_USABLE | |
+|--------------|------------|
+| codItem       | PK, FK |
+| descripcion   |    |
 
 | COPIAS_ARMAS | |
 |--------------|------------|
-| codigoArma | PK, FK |
-| codigoInventario| PK, FK |
-| numCopias  |    |
+| codItem       | PK, FK |
+| numCopias     |    |
 
 | ENEMIGO | |
 |--------------|------------|
 | codigoEnemigo | PK |
+| nombre        |    |
 
 | ENMBASICO | |
 |--------------|------------|
-| codigoEnemigoBas | PK |
-| codigoEnemigo    | Pk, FK |
+| codigoEnemigo | PK, FK |
 
 | JEFE | |
 |--------------|------------|
-| codigoJefe     | PK |
-| codigoEnemigo  | PK, FK |
+| codigoEnemigo | PK, FK |
+
+| DROP_ENEMIGO_ITEM | |
+|--------------|------------|
+| codigoEnemigo | PK, FK |
+| codItem       | PK, FK |
+| cantidadMin   |    |
+| cantidadMax   |    |
+| probabilidad  |    |
 
 | MAPA | |
 |--------------|------------|
 | codigoMapa | PK |
+
+---
+
+### Notas sobre el modelo relacional
+
+1. `ITEM` es la entidad base que contiene `ARMA` y `OBJETO_USABLE` como especializaciones reales (PK compartida).  
+2. `COPIAS_ARMAS` depende de `ARMA` mediante PK compartida (`codItem`).  
+3. `DROP_ENEMIGO_ITEM` materializa la relación N:M entre `ENEMIGO` y `ITEM`, permitiendo atributos adicionales como probabilidad o cantidad.  
+4. `INVENTARIO` contiene `ITEM` y mantiene restricción XOR: pertenece a un jugador **o** a un mapa.  
+5. No existen relaciones directas redundantes entre `JUGADOR ↔ ITEM/ARMA/OBJETO_USABLE`.
 <div style="page-break-before: always;"></div>
 
 ## Bibliografía
