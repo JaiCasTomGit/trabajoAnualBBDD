@@ -17,6 +17,7 @@
         - [Crecimiento](#crecimiento)
         - [Plan de respaldo](#plan-de-respaldo)
 3. [Modelo Entidad Relación](#modelo-entidad-relación)
+    - [Resumen de modificaciones realizadas](#resumen-de-modificaciones-realizadas)
 4. [Modelo Relacional](#modelo-relacional)
 5. [Bibliografía](#bibliografía)
 <div style="page-break-before: always;"></div>
@@ -407,49 +408,49 @@ erDiagram
 
     JUGADOR ||--o{ ENEMIGO : enfrenta
 ```
-# Resumen de modificaciones realizadas
+### Resumen de modificaciones realizadas
 
-## 1. Creación de ITEM como entidad intermedia
+#### 1. Creación de ITEM como entidad intermedia
 - Se introduce `ITEM` como entidad base del sistema de inventario  
 - INVENTARIO pasa a contener ITEM y no directamente ARMA u OBJETO_USABLE  
 - Se evita redundancia estructural entre tipos de objetos  
 
-## 2. Especialización total y exclusiva de ITEM
+#### 2. Especialización total y exclusiva de ITEM
 - Todo ITEM debe ser obligatoriamente:
   - ARMA  
   - OBJETO_USABLE  
 - No puede existir un ITEM genérico sin subtipo  
 - Se aplica restricción conceptual XOR (disyunta y total)
 
-## 3. ARMA pasa a ser especialización real
+#### 3. ARMA pasa a ser especialización real
 - PK compartida (`codItem`)  
 - Se elimina cualquier clave artificial propia  
 - Hereda identidad directamente de ITEM  
 
-## 4. OBJETO_USABLE pasa a ser especialización real
+#### 4. OBJETO_USABLE pasa a ser especialización real
 - PK compartida (`codItem`)  
 - Hereda identidad directamente de ITEM  
 
-## 5. COPIAS_ARMAS
+#### 5. COPIAS_ARMAS
 - Se mantiene como entidad independiente  
 - Depende de ARMA mediante PK compartida (`codItem`)  
 - Permite modelar número de copias sin duplicar armas  
 
-## 6. ENEMIGO
+#### 6. ENEMIGO
 - Se añade el atributo `nombre`  
 - Mejora la coherencia semántica del modelo  
 
-## 7. JEFE y ENMBASICO
+#### 7. JEFE y ENMBASICO
 - Se mantienen como especializaciones reales  
 - PK compartida con ENEMIGO  
 - Especialización disyunta  
 
-## 8. Relación de drop corregida
+#### 8. Relación de drop corregida
 - Se elimina relación directa ENEMIGO ↔ ITEM  
 - Se introduce entidad asociativa `DROP_ENEMIGO_ITEM`  
 - Se modela correctamente la relación N:M  
 
-## 9. Restricción conceptual mantenida
+#### 9. Restricción conceptual mantenida
 - Se mantiene restricción XOR en INVENTARIO  
   (Pertenece a jugador **o** a mapa)
 
