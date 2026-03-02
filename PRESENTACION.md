@@ -495,6 +495,7 @@ CREATE TABLE ITEM (
         REFERENCES INVENTARIO(codigoInventario)
 );
 ```
+>Referenciamos el inventario, puesto que los items estarán en el inventario, además tenemos que asegurarnos de que item es o Arma o Objeto Usable, ya que no hay mas clases de Items
 ### ARMA
 ```sql
 -- COMENTARIO: Especialización total de ITEM
@@ -505,6 +506,7 @@ CREATE TABLE ARMA (
         REFERENCES ITEM(codItem)
 );
 ```
+>Referenciamos los Items ya que arma es una clase de
 ### COPIAS_ARMAS
 ```sql
 -- COMENTARIO: Cantidad de copias de cada arma
@@ -515,6 +517,7 @@ CREATE TABLE COPIAS_ARMAS (
         REFERENCES ARMA(codItem)
 );
 ```
+>Copias armas no existiría sin Armas, asi que la referenciamos
 ### INVENTARIO
 ```sql
 -- COMENTARIO: Puede pertenecer a un jugador o a un mapa (XOR)
@@ -533,6 +536,7 @@ CREATE TABLE INVENTARIO (
     )
 );
 ```
+>En este caso en concreto, por ejemplo, nos encontramos con que Inventario referencia tanto a  jugador como a, esto es porque ésta clase se encarga de todo lo relacionado con los inventarios tanto del mapa como del jugador, siendo la clausula CHECK para determinar que cuando un jugador recoge un objeto del mapa, este pasa a SU inventario
 ### ENEMIGO
 ```sql
 -- COMENTARIO: Representa todos los enemigos con nombre
@@ -555,8 +559,10 @@ CREATE TABLE DROP_ENEMIGO_ITEM (
         REFERENCES ITEM(codItem)
 );
 
+
 ---
 ```
+>Aquí tenemos que reflejar un `drop`, para ello necesitamso acceder al item y al enemigo, por eso los referenciamos
 ## INSERTS (al menos 10 por tabla)
 
 -- CLASE
@@ -572,6 +578,7 @@ INSERT INTO CLASE VALUES (8,'Berserker');
 INSERT INTO CLASE VALUES (9,'Druida');
 INSERT INTO CLASE VALUES (10,'Monje');
 ```
+>Varias clases
 -- JUGADOR
 ```sql
 INSERT INTO JUGADOR VALUES (1,'Aldric',15,1);
@@ -585,6 +592,7 @@ INSERT INTO JUGADOR VALUES (8,'Ragnar',35,8);
 INSERT INTO JUGADOR VALUES (9,'Eira',16,9);
 INSERT INTO JUGADOR VALUES (10,'Zane',19,10);
 ```
+>Varios jugadores
 -- ITEM
 ```sql
 INSERT INTO ITEM VALUES (1,1,'Espada basica','ARMA');
@@ -598,6 +606,7 @@ INSERT INTO ITEM VALUES (8,8,'Pergamino','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (9,9,'Bomba','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (10,10,'Anillo fuerza','OBJETO_USABLE');
 ```
+>Varios items, tanto armas como objetos usables
 -- ARMA
 ```sql
 INSERT INTO ARMA VALUES (1,50);
@@ -611,6 +620,7 @@ INSERT INTO ARMA VALUES (8,75);
 INSERT INTO ARMA VALUES (9,50);
 INSERT INTO ARMA VALUES (10,90);
 ```
+>Las armas y sus códigos, el nombre viene en objetos por ser una jerarquía
 -- COPIAS_ARMAS
 ```sql
 INSERT INTO COPIAS_ARMAS VALUES (1,2);
@@ -624,6 +634,7 @@ INSERT INTO COPIAS_ARMAS VALUES (8,3);
 INSERT INTO COPIAS_ARMAS VALUES (9,2);
 INSERT INTO COPIAS_ARMAS VALUES (10,1);
 ```
+>Copias de las armas, con el codigo del arma y el num de copias
 -- ENEMIGO
 ```sql
 INSERT INTO ENEMIGO VALUES (1,'Goblin');
@@ -637,6 +648,7 @@ INSERT INTO ENEMIGO VALUES (8,'Dragón pequeño');
 INSERT INTO ENEMIGO VALUES (9,'Murciélago');
 INSERT INTO ENEMIGO VALUES (10,'Slime');
 ```
+>Tanto bosses como enemigos básicos, con sus nombres y sus códigos
 -- DROP_ENEMIGO_ITEM
 ```sql
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (1,1,100);
@@ -659,6 +671,7 @@ COMMIT;
 
 ---
 ```
+>Los `drops` de los enemigos con lso códigos correspondientes
 
 ## 5 SELECT DE DISTINTA COMPLEJIDAD
 
