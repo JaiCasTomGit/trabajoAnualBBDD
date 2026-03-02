@@ -350,7 +350,7 @@ erDiagram
 - Se elimina relación directa ENEMIGO ↔ ITEM  
 - Se introduce entidad asociativa `DROP_ENEMIGO_ITEM`  
 - Se modela correctamente la relación N:M  
-
+ 
 #### 9. Restricción conceptual mantenida
 - Se mantiene restricción XOR en INVENTARIO  
   (Pertenece a jugador **o** a mapa)
