@@ -472,6 +472,9 @@ Con esto el modelo queda consistente en especialización, normalización y contr
 
 # MODELO FÍSICO, INSERTS Y SELECTS
 
+## MODELO FÍSICO
+<img src="RelacionalAnual.png">
+
 ## USUARIO
 ```sql
 -- COMENTARIO: creación de usuario y permisos
