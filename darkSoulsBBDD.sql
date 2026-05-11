@@ -1,4 +1,7 @@
+-- =========================================================
 -- BORRAR TABLAS SI EXISTEN
+-- =========================================================
+
 DROP TABLE DROP_ENEMIGO_ITEM CASCADE CONSTRAINTS;
 DROP TABLE COPIAS_ARMAS CASCADE CONSTRAINTS;
 DROP TABLE ARMA CASCADE CONSTRAINTS;
@@ -17,40 +20,57 @@ DROP TABLE CLASE_GUERRERO CASCADE CONSTRAINTS;
 DROP TABLE JUGADOR CASCADE CONSTRAINTS;
 DROP TABLE CLASE CASCADE CONSTRAINTS;
 
--- COMENTARIO: TABLA CLASE
+-- =========================================================
+-- TABLA CLASE
+-- =========================================================
+
 CREATE TABLE CLASE (
     codigoClase NUMBER(3) PRIMARY KEY,
     nomClase VARCHAR2(20)
 );
 
--- COMENTARIO: TABLA CLASES ESPECIFICAS
+-- =========================================================
+-- TABLAS ESPECIFICAS DE CLASE
+-- =========================================================
+
 CREATE TABLE CLASE_GUERRERO (
     codigoClase NUMBER(3) PRIMARY KEY,
     CONSTRAINT fk_clase_guerrero FOREIGN KEY (codigoClase)
         REFERENCES CLASE(codigoClase)
 );
+
 CREATE TABLE CLASE_MAGO (
     codigoClase NUMBER(3) PRIMARY KEY,
     CONSTRAINT fk_clase_mago FOREIGN KEY (codigoClase)
         REFERENCES CLASE(codigoClase)
 );
+
 CREATE TABLE CLASE_CABALLERO (
     codigoClase NUMBER(3) PRIMARY KEY,
     CONSTRAINT fk_clase_caballero FOREIGN KEY (codigoClase)
         REFERENCES CLASE(codigoClase)
 );
 
--- COMENTARIO: TABLA JUGADOR
+-- =========================================================
+-- TABLA JUGADOR
+-- MODIFICADA: AÑADIDO CAMPO fecha_guardado
+-- =========================================================
+
 CREATE TABLE JUGADOR (
     codigoJugador NUMBER(3) PRIMARY KEY,
     nombre VARCHAR2(40),
     nivel NUMBER(2),
     codigoClase NUMBER(3),
+    fecha_guardado DATE,
+
     CONSTRAINT fk_jugador_clase FOREIGN KEY (codigoClase)
         REFERENCES CLASE(codigoClase)
 );
 
--- COMENTARIO: TABLA ESTADISTICAS_CLASE
+-- =========================================================
+-- TABLA ESTADISTICAS_CLASE
+-- =========================================================
+
 CREATE TABLE ESTADISTICAS_CLASE (
     codigoClase NUMBER(3) PRIMARY KEY,
     fuerza_base NUMBER(3),
@@ -58,11 +78,15 @@ CREATE TABLE ESTADISTICAS_CLASE (
     arcano_base NUMBER(3),
     agilidad_base NUMBER(3),
     salud_base NUMBER(3),
+
     CONSTRAINT fk_estadisticas_clase FOREIGN KEY (codigoClase)
         REFERENCES CLASE(codigoClase)
 );
 
--- COMENTARIO: TABLA EST_JUGADOR
+-- =========================================================
+-- TABLA EST_JUGADOR
+-- =========================================================
+
 CREATE TABLE EST_JUGADOR (
     codigoJugador NUMBER(3) PRIMARY KEY,
     fuerza NUMBER(3),
@@ -71,103 +95,150 @@ CREATE TABLE EST_JUGADOR (
     agilidad NUMBER(3),
     salud NUMBER(3),
     puntos_disponibles NUMBER(3),
+
     CONSTRAINT fk_est_jugador FOREIGN KEY (codigoJugador)
         REFERENCES JUGADOR(codigoJugador)
 );
 
--- COMENTARIO: TABLA MAPA
+-- =========================================================
+-- TABLA MAPA
+-- =========================================================
+
 CREATE TABLE MAPA (
     codigoMapa NUMBER(3) PRIMARY KEY
 );
 
--- COMENTARIO: TABLA INVENTARIO (XOR jugador/mapa)
+-- =========================================================
+-- TABLA INVENTARIO
+-- =========================================================
+
 CREATE TABLE INVENTARIO (
     codigoInventario NUMBER(3) PRIMARY KEY,
     tipoInventario VARCHAR2(50),
     codigoJugador NUMBER(3),
     codigoMapa NUMBER(3),
+
     CONSTRAINT fk_inventario_jugador FOREIGN KEY (codigoJugador)
         REFERENCES JUGADOR(codigoJugador),
+
     CONSTRAINT fk_inventario_mapa FOREIGN KEY (codigoMapa)
         REFERENCES MAPA(codigoMapa),
+
     CONSTRAINT chk_inventario_xor CHECK (
-        (codigoJugador IS NOT NULL AND codigoMapa IS NULL) OR
+        (codigoJugador IS NOT NULL AND codigoMapa IS NULL)
+        OR
         (codigoJugador IS NULL AND codigoMapa IS NOT NULL)
     )
 );
 
--- COMENTARIO: TABLA ITEM
+-- =========================================================
+-- TABLA ITEM
+-- =========================================================
+
 CREATE TABLE ITEM (
     codItem NUMBER(3) PRIMARY KEY,
     codigoInventario NUMBER(3),
     nomItem VARCHAR2(100),
     tipoItem VARCHAR2(50),
+
     CONSTRAINT fk_item_inventario FOREIGN KEY (codigoInventario)
         REFERENCES INVENTARIO(codigoInventario),
-    CONSTRAINT chk_tipoItem CHECK (tipoItem IN ('ARMA','OBJETO_USABLE'))
+
+    CONSTRAINT chk_tipoItem CHECK (
+        tipoItem IN ('ARMA','OBJETO_USABLE')
+    )
 );
 
--- COMENTARIO: TABLA ARMA (subtipo de ITEM)
+-- =========================================================
+-- TABLA ARMA
+-- =========================================================
+
 CREATE TABLE ARMA (
     codItem NUMBER(3) PRIMARY KEY,
     dano NUMBER(3),
+
     CONSTRAINT fk_arma_item FOREIGN KEY (codItem)
         REFERENCES ITEM(codItem)
 );
 
--- COMENTARIO: TABLA OBJETO_USABLE (subtipo de ITEM)
+-- =========================================================
+-- TABLA OBJETO_USABLE
+-- =========================================================
+
 CREATE TABLE OBJETO_USABLE (
     codItem NUMBER(3) PRIMARY KEY,
     descripcion VARCHAR2(100),
+
     CONSTRAINT fk_objeto_item FOREIGN KEY (codItem)
         REFERENCES ITEM(codItem)
 );
 
--- COMENTARIO: TABLA COPIAS_ARMAS
+-- =========================================================
+-- TABLA COPIAS_ARMAS
+-- =========================================================
+
 CREATE TABLE COPIAS_ARMAS (
     codItem NUMBER(3) PRIMARY KEY,
     numCopias NUMBER(3),
+
     CONSTRAINT fk_copias_armas FOREIGN KEY (codItem)
         REFERENCES ARMA(codItem)
 );
 
--- COMENTARIO: TABLA ENEMIGO
+-- =========================================================
+-- TABLA ENEMIGO
+-- =========================================================
+
 CREATE TABLE ENEMIGO (
     codigoEnemigo NUMBER(3) PRIMARY KEY,
     nombre VARCHAR2(100)
 );
 
--- COMENTARIO: TABLA JEFE (subtipo ENEMIGO)
+-- =========================================================
+-- TABLA JEFE
+-- =========================================================
+
 CREATE TABLE JEFE (
     codigoEnemigo NUMBER(3) PRIMARY KEY,
+
     CONSTRAINT fk_jefe_enemigo FOREIGN KEY (codigoEnemigo)
         REFERENCES ENEMIGO(codigoEnemigo)
 );
 
--- COMENTARIO: TABLA ENMBASICO (subtipo ENEMIGO)
+-- =========================================================
+-- TABLA ENMBASICO
+-- =========================================================
+
 CREATE TABLE ENMBASICO (
     codigoEnemigo NUMBER(3) PRIMARY KEY,
+
     CONSTRAINT fk_enmbasico_enemigo FOREIGN KEY (codigoEnemigo)
         REFERENCES ENEMIGO(codigoEnemigo)
 );
 
--- COMENTARIO: TABLA DROP_ENEMIGO_ITEM
+-- =========================================================
+-- TABLA DROP_ENEMIGO_ITEM
+-- =========================================================
+
 CREATE TABLE DROP_ENEMIGO_ITEM (
     codigoEnemigo NUMBER(3),
     codItem NUMBER(3),
     cantidadMin NUMBER(3),
     cantidadMax NUMBER(3),
     probabilidad NUMBER(3),
-    PRIMARY KEY (codigoEnemigo,codItem),
+
+    PRIMARY KEY (codigoEnemigo, codItem),
+
     CONSTRAINT fk_drop_enemigo FOREIGN KEY (codigoEnemigo)
         REFERENCES ENEMIGO(codigoEnemigo),
+
     CONSTRAINT fk_drop_item FOREIGN KEY (codItem)
         REFERENCES ITEM(codItem)
 );
+-- =========================================================
+-- INSERTS CLASE
+-- =========================================================
 
--- INSERTS DE EJEMPLO COHERENTES
-
--- CLASE
 INSERT INTO CLASE VALUES (1,'Guerrero');
 INSERT INTO CLASE VALUES (2,'Mago');
 INSERT INTO CLASE VALUES (3,'Caballero');
@@ -179,24 +250,103 @@ INSERT INTO CLASE VALUES (8,'Nigromante');
 INSERT INTO CLASE VALUES (9,'Berserker');
 INSERT INTO CLASE VALUES (10,'Monje');
 
--- CLASES ESPECIFICAS
+-- =========================================================
+-- INSERTS CLASES ESPECIFICAS
+-- =========================================================
+
 INSERT INTO CLASE_GUERRERO VALUES (1);
 INSERT INTO CLASE_MAGO VALUES (2);
 INSERT INTO CLASE_CABALLERO VALUES (3);
 
--- JUGADOR
-INSERT INTO JUGADOR VALUES (1,'Aldric',15,1);
-INSERT INTO JUGADOR VALUES (2,'Selene',20,2);
-INSERT INTO JUGADOR VALUES (3,'Kael',18,3);
-INSERT INTO JUGADOR VALUES (4,'Mira',22,4);
-INSERT INTO JUGADOR VALUES (5,'Thorn',30,5);
-INSERT INTO JUGADOR VALUES (6,'Luna',12,6);
-INSERT INTO JUGADOR VALUES (7,'Drake',25,7);
-INSERT INTO JUGADOR VALUES (8,'Ragnar',35,8);
-INSERT INTO JUGADOR VALUES (9,'Eira',16,9);
-INSERT INTO JUGADOR VALUES (10,'Zane',19,10);
+-- =========================================================
+-- INSERTS JUGADOR
+-- MODIFICADO: AÑADIDO fecha_guardado
+-- =========================================================
 
--- ESTADISTICAS_CLASE
+INSERT INTO JUGADOR VALUES (
+    1,
+    'Aldric',
+    15,
+    1,
+    TO_DATE('2026-01-10','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    2,
+    'Selene',
+    20,
+    2,
+    TO_DATE('2026-02-15','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    3,
+    'Kael',
+    18,
+    3,
+    TO_DATE('2026-03-02','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    4,
+    'Mira',
+    22,
+    4,
+    TO_DATE('2026-03-15','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    5,
+    'Thorn',
+    30,
+    5,
+    TO_DATE('2026-04-01','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    6,
+    'Luna',
+    12,
+    6,
+    TO_DATE('2026-04-10','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    7,
+    'Drake',
+    25,
+    7,
+    TO_DATE('2026-04-15','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    8,
+    'Ragnar',
+    35,
+    8,
+    TO_DATE('2026-04-20','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    9,
+    'Eira',
+    16,
+    9,
+    TO_DATE('2026-05-01','YYYY-MM-DD')
+);
+
+INSERT INTO JUGADOR VALUES (
+    10,
+    'Zane',
+    19,
+    10,
+    TO_DATE('2026-05-07','YYYY-MM-DD')
+);
+
+-- =========================================================
+-- INSERTS ESTADISTICAS_CLASE
+-- =========================================================
+
 INSERT INTO ESTADISTICAS_CLASE VALUES (1,15,10,5,8,20);
 INSERT INTO ESTADISTICAS_CLASE VALUES (2,5,8,20,10,12);
 INSERT INTO ESTADISTICAS_CLASE VALUES (3,18,12,8,7,25);
@@ -208,7 +358,10 @@ INSERT INTO ESTADISTICAS_CLASE VALUES (8,6,9,22,10,13);
 INSERT INTO ESTADISTICAS_CLASE VALUES (9,22,12,4,7,30);
 INSERT INTO ESTADISTICAS_CLASE VALUES (10,9,11,18,12,16);
 
--- EST_JUGADOR
+-- =========================================================
+-- INSERTS EST_JUGADOR
+-- =========================================================
+
 INSERT INTO EST_JUGADOR VALUES (1,20,12,6,10,30,5);
 INSERT INTO EST_JUGADOR VALUES (2,6,10,28,12,18,4);
 INSERT INTO EST_JUGADOR VALUES (3,12,22,8,20,19,6);
@@ -220,7 +373,10 @@ INSERT INTO EST_JUGADOR VALUES (8,30,16,5,10,45,10);
 INSERT INTO EST_JUGADOR VALUES (9,11,15,24,18,21,5);
 INSERT INTO EST_JUGADOR VALUES (10,18,20,12,22,23,6);
 
--- MAPA
+-- =========================================================
+-- INSERTS MAPA
+-- =========================================================
+
 INSERT INTO MAPA VALUES (1);
 INSERT INTO MAPA VALUES (2);
 INSERT INTO MAPA VALUES (3);
@@ -232,7 +388,10 @@ INSERT INTO MAPA VALUES (8);
 INSERT INTO MAPA VALUES (9);
 INSERT INTO MAPA VALUES (10);
 
--- ENEMIGO (20 en total para cubrir 10 básicos + 10 jefes)
+-- =========================================================
+-- INSERTS ENEMIGO
+-- =========================================================
+
 INSERT INTO ENEMIGO VALUES (1,'Goblin');
 INSERT INTO ENEMIGO VALUES (2,'Orco');
 INSERT INTO ENEMIGO VALUES (3,'Troll');
@@ -254,7 +413,10 @@ INSERT INTO ENEMIGO VALUES (18,'Araña Gigante');
 INSERT INTO ENEMIGO VALUES (19,'Serpiente Marina');
 INSERT INTO ENEMIGO VALUES (20,'Ogro');
 
--- JEFE (10 registros)
+-- =========================================================
+-- INSERTS JEFE
+-- =========================================================
+
 INSERT INTO JEFE VALUES (7);
 INSERT INTO JEFE VALUES (3);
 INSERT INTO JEFE VALUES (11);
@@ -268,7 +430,10 @@ INSERT INTO JEFE VALUES (18);
 INSERT INTO JEFE VALUES (19);
 INSERT INTO JEFE VALUES (20);
 
--- ENMBASICO (10 registros)
+-- =========================================================
+-- INSERTS ENMBASICO
+-- =========================================================
+
 INSERT INTO ENMBASICO VALUES (1);
 INSERT INTO ENMBASICO VALUES (2);
 INSERT INTO ENMBASICO VALUES (4);
@@ -280,7 +445,10 @@ INSERT INTO ENMBASICO VALUES (10);
 INSERT INTO ENMBASICO VALUES (3);
 INSERT INTO ENMBASICO VALUES (12);
 
--- INVENTARIO (10 jugador + 10 mundo)
+-- =========================================================
+-- INSERTS INVENTARIO
+-- =========================================================
+
 INSERT INTO INVENTARIO VALUES (1,'Jugador',1,NULL);
 INSERT INTO INVENTARIO VALUES (2,'Jugador',2,NULL);
 INSERT INTO INVENTARIO VALUES (3,'Jugador',3,NULL);
@@ -291,6 +459,7 @@ INSERT INTO INVENTARIO VALUES (7,'Jugador',7,NULL);
 INSERT INTO INVENTARIO VALUES (8,'Jugador',8,NULL);
 INSERT INTO INVENTARIO VALUES (9,'Jugador',9,NULL);
 INSERT INTO INVENTARIO VALUES (10,'Jugador',10,NULL);
+
 INSERT INTO INVENTARIO VALUES (11,'Mundo',NULL,1);
 INSERT INTO INVENTARIO VALUES (12,'Mundo',NULL,2);
 INSERT INTO INVENTARIO VALUES (13,'Mundo',NULL,3);
@@ -302,7 +471,10 @@ INSERT INTO INVENTARIO VALUES (18,'Mundo',NULL,8);
 INSERT INTO INVENTARIO VALUES (19,'Mundo',NULL,9);
 INSERT INTO INVENTARIO VALUES (20,'Mundo',NULL,10);
 
--- ITEM (10 ARMA + 10 OBJETO_USABLE)
+-- =========================================================
+-- INSERTS ITEM
+-- =========================================================
+
 INSERT INTO ITEM VALUES (1,1,'Espada basica','ARMA');
 INSERT INTO ITEM VALUES (2,2,'Baculo magico','ARMA');
 INSERT INTO ITEM VALUES (3,3,'Arco largo','ARMA');
@@ -313,6 +485,7 @@ INSERT INTO ITEM VALUES (7,7,'Hacha','ARMA');
 INSERT INTO ITEM VALUES (8,8,'Lanza','ARMA');
 INSERT INTO ITEM VALUES (9,9,'Katana','ARMA');
 INSERT INTO ITEM VALUES (10,10,'Espadon','ARMA');
+
 INSERT INTO ITEM VALUES (11,11,'Poción vida','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (12,12,'Poción maná','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (13,13,'Pergamino','OBJETO_USABLE');
@@ -324,7 +497,10 @@ INSERT INTO ITEM VALUES (18,18,'Bomba','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (19,19,'Capa','OBJETO_USABLE');
 INSERT INTO ITEM VALUES (20,20,'Guantes','OBJETO_USABLE');
 
--- ARMA
+-- =========================================================
+-- INSERTS ARMA
+-- =========================================================
+
 INSERT INTO ARMA VALUES (1,50);
 INSERT INTO ARMA VALUES (2,70);
 INSERT INTO ARMA VALUES (3,60);
@@ -336,7 +512,10 @@ INSERT INTO ARMA VALUES (8,68);
 INSERT INTO ARMA VALUES (9,72);
 INSERT INTO ARMA VALUES (10,90);
 
--- OBJETO_USABLE
+-- =========================================================
+-- INSERTS OBJETO_USABLE
+-- =========================================================
+
 INSERT INTO OBJETO_USABLE VALUES (11,'Restaura 50HP');
 INSERT INTO OBJETO_USABLE VALUES (12,'Restaura 30MP');
 INSERT INTO OBJETO_USABLE VALUES (13,'Hechizo fuego');
@@ -348,7 +527,10 @@ INSERT INTO OBJETO_USABLE VALUES (18,'Explosivo');
 INSERT INTO OBJETO_USABLE VALUES (19,'Capa de invisibilidad');
 INSERT INTO OBJETO_USABLE VALUES (20,'Guantes de fuerza');
 
--- COPIAS_ARMAS
+-- =========================================================
+-- INSERTS COPIAS_ARMAS
+-- =========================================================
+
 INSERT INTO COPIAS_ARMAS VALUES (1,2);
 INSERT INTO COPIAS_ARMAS VALUES (2,1);
 INSERT INTO COPIAS_ARMAS VALUES (3,3);
@@ -360,7 +542,10 @@ INSERT INTO COPIAS_ARMAS VALUES (8,3);
 INSERT INTO COPIAS_ARMAS VALUES (9,2);
 INSERT INTO COPIAS_ARMAS VALUES (10,1);
 
--- DROP_ENEMIGO_ITEM
+-- =========================================================
+-- INSERTS DROP_ENEMIGO_ITEM
+-- =========================================================
+
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (1,1,1,1,80);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (2,2,1,2,50);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (3,3,1,1,60);
@@ -371,6 +556,7 @@ INSERT INTO DROP_ENEMIGO_ITEM VALUES (7,7,1,1,100);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (8,8,1,1,30);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (9,9,1,1,20);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (10,10,1,1,10);
+
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (11,11,1,1,50);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (12,12,1,1,60);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (13,13,1,1,40);
@@ -383,3 +569,4 @@ INSERT INTO DROP_ENEMIGO_ITEM VALUES (19,19,1,1,5);
 INSERT INTO DROP_ENEMIGO_ITEM VALUES (20,20,1,1,5);
 
 COMMIT;
+
