@@ -37,24 +37,23 @@ Ya que en la entrega anterior no icluímos el modelo lógico dejamos tanto el mo
 ## Consultas realizadas sobre las tablas
 
 ### Consulta 1
-Mostrar los jugadores junto con su clase y estadísticas, filtrando únicamente aquellos cuyo nivel sea superior a la media de todos los jugadores. Los resultados deben ordenarse de mayor a menor nivel.
+Muestra los jugadores junto con su clase y estadísticas, filtrando únicamente aquellos cuyo nivel sea superior a la media de todos los jugadores. Los resultados se ordenan de mayor a menor nivel.
 
 ### Consulta 2
-Obtener el número total de ítems que posee cada jugador, incluyendo aquellos jugadores que no tengan ningún ítem. Además, se deben mostrar únicamente los jugadores que hayan guardado la partida desde marzo de 2026 en adelante, ordenando el resultado de mayor a menor número de ítems.
+Obtiene el número total de ítems que posee cada jugador, incluyendo aquellos jugadores que no tengan ningún ítem. Además, se deberían mostrar únicamente los jugadores que hayan guardado la partida desde marzo de 2026 en adelante, ordenando el resultado de mayor a menor número de ítems.
 
 ### Consulta 3
-Calcular la media de probabilidad de drop de objetos para cada enemigo, mostrando todos los enemigos aunque no tengan drops asociados. Los resultados deben ordenarse de mayor a menor probabilidad media.
+Calcula la media de probabilidad de drop de objetos para cada enemigo, mostrando todos los enemigos aunque no tengan drops asociados. Los resultados deben ordenarse de mayor a menor probabilidad media.
 
 ### Consulta 4
-Listar las armas cuyo daño es superior a la media global de todas las armas. Además, se debe mostrar el número de copias disponibles de cada arma (si no tiene copias, mostrar 0), ordenando por daño de forma descendente.
+Lista las armas cuyo daño es superior a la media global de todas las armas. Además, se debería mostrar el número de copias disponibles de cada arma (si no tiene copias, mostraría 0), ordenando por daño de forma descendente.
 
 ### Consulta 5
-Mostrar los jugadores junto con su clase, filtrando aquellos cuya fecha de guardado esté dentro de los últimos 30 días respecto a la fecha más reciente registrada en la base de datos. Los resultados deben aparecer ordenados por fecha de guardado de forma descendente.
+Muestra los jugadores junto con su clase, filtrando aquellos cuya fecha de guardado esté dentro de los últimos 30 días respecto a la fecha más reciente registrada en la base de datos. Los resultados deberían aparecer ordenados por fecha de guardado de forma descendente.
 
 ```sql
 -- =========================================================
 -- CONSULTA 1: Jugadores con su clase, estadísticas y filtrado por nivel superior a la media
--- (INNER JOIN + SUBCONSULTA + ORDENACIÓN)
 -- =========================================================
 
 SELECT 
@@ -77,7 +76,6 @@ ORDER BY j.nivel DESC;
 
 -- =========================================================
 -- CONSULTA 2: Número de items por jugador (incluyendo jugadores sin items)
--- (LEFT JOIN + AGRUPACIÓN + FECHAS + ORDENACIÓN)
 -- =========================================================
 
 SELECT 
@@ -95,7 +93,6 @@ ORDER BY total_items DESC;
 
 -- =========================================================
 -- CONSULTA 3: Enemigos con media de probabilidad de drop de items
--- (LEFT JOIN + AGRUPACIÓN + ORDENACIÓN)
 -- =========================================================
 
 SELECT 
@@ -111,7 +108,6 @@ ORDER BY prob_media_drop DESC NULLS LAST;
 
 -- =========================================================
 -- CONSULTA 4: Armas con daño superior al promedio general de armas
--- (INNER JOIN + SUBCONSULTA + LEFT JOIN + ORDENACIÓN)
 -- =========================================================
 
 SELECT 
@@ -130,7 +126,6 @@ ORDER BY a.dano DESC;
 
 -- =========================================================
 -- CONSULTA 5: Jugadores con su clase y filtrado por los más recientes
--- (INNER JOIN + SUBCONSULTA + FECHAS + ORDENACIÓN)
 -- =========================================================
 
 SELECT 
@@ -151,7 +146,237 @@ ORDER BY j.fecha_guardado DESC;
 
 ### Funciones
 
+#### PLSQL_FUNCTION_DANO_TOTAL_JUGADOR
+
+```sql
+CREATE OR REPLACE FUNCTION PLSQL_FUNCTION_DANO_TOTAL_JUGADOR (v_codigoJugador jugador.codigojugador%type)
+RETURN NUMBER
+IS
+    v_nombre_jugador jugador.nombre%type;
+    v_dano_total arma.dano%type;
+BEGIN
+
+    SELECT NVL(SUM(a.dano),0)
+    INTO v_dano_total
+    FROM JUGADOR j
+    INNER JOIN INVENTARIO inv 
+        ON j.codigoJugador = inv.codigoJugador
+    INNER JOIN ITEM i 
+        ON inv.codigoInventario = i.codigoInventario
+    INNER JOIN ARMA a 
+        ON i.codItem = a.codItem
+    WHERE j.codigoJugador = v_codigoJugador;
+
+    DBMS_OUTPUT.PUT_LINE('DAÑO TOTAL DEL JUGADOR: '||v_dano_total);
+    RETURN v_dano_total;
+    
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('NO SE HA ENCONTRADO EL JUGADOR');
+            RETURN 0;
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('SE HAN PRODUCIDO ERRORES');
+            RETURN 0;
+END;
+
+
+```
+
+Esta función calcula el daño total de las armas que posee un jugador dentro de su inventario.
+
+La función recibe como parámetro el código del jugador y realiza varias composiciones internas (`INNER JOIN`) entre las tablas `JUGADOR`, `INVENTARIO`, `ITEM` y `ARMA` para obtener todas las armas asociadas al jugador y sumar su daño total mediante la función de agregación `SUM`.
+
+En caso de que el jugador no posea armas, la función devuelve `0` utilizando `NVL`.
+
+La función devuelve un valor numérico de tipo `NUMBER` y un mensaje.
+
+
+
+#### PLSQL_FUNCTION_RANGO_JUGADOR
+
+```sql
+CREATE OR REPLACE FUNCTION PLSQL_FUNCTION_RANGO_JUGADOR (v_nivel jugador.nivel%type)
+RETURN VARCHAR2
+IS
+    v_rango VARCHAR2(30);
+BEGIN
+
+    IF v_nivel < 10 THEN
+        v_rango := 'Principiante';
+
+    ELSIF v_nivel BETWEEN 10 AND 20 THEN
+        v_rango := 'Intermedio';
+
+    ELSIF v_nivel BETWEEN 21 AND 30 THEN
+        v_rango := 'Avanzado';
+
+    ELSE
+        v_rango := 'Legendario';
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('RANGO DEL JUGADOR: ' || v_rango);
+    RETURN v_rango;
+    
+END;
+
+
+-- Ejemplo de uso:
+-- SELECT nombre, nivel, PLSQL_FUNCTION_RANGO_JUGADOR(nivel)
+-- FROM JUGADOR;
+```
+
+
+Esta función recibe como parámetro el nivel de un jugador y devuelve un rango descriptivo dependiendo de dicho nivel.
+
+Los rangos definidos son:
+
+- Menor de 10 → `Principiante`
+- Entre 10 y 20 → `Intermedio`
+- Entre 21 y 30 → `Avanzado`
+- Mayor de 30 → `Legendario`
+
+La función devuelve un mensaje con una variable `VARCHAR2` que contiene el valor del rango de los definidos.
+
 ### Procedimientos
+
+#### PLSQL_PROCEDURE_GUARDAR_PROGRESO_JUGADOR
+
+```sql
+CREATE OR REPLACE PROCEDURE PLSQL_PROCEDURE_GUARDAR_PROGRESO_JUGADOR (v_codigoJugador JUGADOR.codigoJugador%TYPE, v_nuevoNivel JUGADOR.nivel%TYPE)
+IS
+    v_nivel_actual JUGADOR.nivel%TYPE;
+BEGIN
+
+    SELECT nivel
+    INTO v_nivel_actual
+    FROM JUGADOR
+    WHERE codigoJugador = v_codigoJugador;
+
+    IF v_nuevoNivel >= v_nivel_actual THEN
+
+        UPDATE JUGADOR
+        SET 
+            nivel = v_nuevoNivel,
+            fecha_guardado = SYSDATE
+        WHERE codigoJugador = v_codigoJugador;
+
+        COMMIT;
+
+        DBMS_OUTPUT.PUT_LINE('PROGRESO GUARDADO CORRECTAMENTE.');
+
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('NO SE PUEDE REDUCIR EL NIVEL DEL JUGADOR.');
+    END IF;
+
+EXCEPTION
+
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('JUGADOR NO ENCONTRADO.');
+
+    WHEN VALUE_ERROR THEN
+        DBMS_OUTPUT.PUT_LINE('ERROR DE TIPO DE DATO EN LOS VALORES INTRODUCIDOS.');
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('SE HAN PRODUCIDO ERRORES');
+
+END;
+```
+
+Este procedimiento permite guardar el progreso de un jugador dentro del sistema.
+
+Recibe como parámetros el código del jugador y el nuevo nivel que se desea asignar.
+
+Su funcionamiento es el siguiente:
+
+1. Se obtiene el nivel actual del jugador desde la base de datos.
+2. Se compara el nuevo nivel con el nivel existente.
+3. Si el nuevo nivel es mayor o igual, se actualiza el registro del jugador.
+4. Se actualiza también la fecha de guardado con la fecha actual del sistema.
+5. Se confirma la operación mediante `COMMIT`.
+6. Se muestran mensajes informativos mediante `DBMS_OUTPUT`.
+
+En caso de error, el procedimiento controla las siguientes excepciones:
+- `NO_DATA_FOUND`: cuando el jugador no existe en la base de datos.
+- `VALUE_ERROR`: cuando hay un error de tipo de dato en los valores introducidos.
+- `OTHERS`: captura cualquier otro error no controlado, mostrando un mensaje genérico.
+
+
+
+#### PLSQL_PROCEDURE_LISTAR_INVENTARIO_JUGADOR
+
+```sql
+CREATE OR REPLACE PROCEDURE PLSQL_PROCEDURE_LISTAR_INVENTARIO_JUGADOR (v_codigoJugador JUGADOR.codigoJugador%TYPE)
+IS
+
+    CURSOR cur_inv IS
+        SELECT 
+            i.codItem,
+            i.nomItem,
+            i.tipoItem,
+            inv.tipoInventario
+        FROM INVENTARIO inv
+        INNER JOIN ITEM i
+            ON inv.codigoInventario = i.codigoInventario
+        WHERE inv.codigoJugador = v_codigoJugador;
+
+    v_codItem        ITEM.codItem%TYPE;
+    v_nomItem        ITEM.nomItem%TYPE;
+    v_tipoItem       ITEM.tipoItem%TYPE;
+    v_tipoInventario INVENTARIO.tipoInventario%TYPE;
+
+BEGIN
+
+    OPEN cur_inv;
+
+    LOOP
+        FETCH cur_inv INTO 
+            v_codItem,
+            v_nomItem,
+            v_tipoItem,
+            v_tipoInventario;
+
+        EXIT WHEN cur_inv%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE(
+            'ITEM: ' || v_codItem ||
+            ' | ' || v_nomItem ||
+            ' | TIPO: ' || v_tipoItem ||
+            ' | INVENTARIO: ' || v_tipoInventario
+        );
+    END LOOP;
+
+    CLOSE cur_inv;
+
+EXCEPTION
+
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('NO EXISTEN DATOS PARA ESE JUGADOR.');
+
+    WHEN VALUE_ERROR THEN
+        DBMS_OUTPUT.PUT_LINE('ERROR DE TIPO DE DATO.');
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('SE HAN PRODUCIDO ERRORES');
+
+END;
+```
+
+Este procedimiento muestra el inventario completo asociado a un jugador mediante el uso de un cursor explícito.
+
+Recibe como parámetro el código del jugador.
+
+Su funcionamiento es el siguiente:
+
+1. Se define un cursor que recupera los ítems asociados al inventario del jugador.
+2. Se abre el cursor para comenzar la lectura de datos.
+3. Se recorre cada fila del cursor de forma secuencial.
+4. Por cada registro, se muestran los datos del ítem mediante `DBMS_OUTPUT`.
+5. Se cierra el cursor una vez finalizada la lectura.
+
+En caso de error, se contemplan las siguientes excepciones:
+- `NO_DATA_FOUND`: si no existen datos asociados al jugador.
+- `VALUE_ERROR`: si ocurre un problema de tipo de datos.
+- `OTHERS`: captura cualquier otro error no previsto, mostrando un mensaje genérico.
 
 ### Triggers (Investigación)
 
