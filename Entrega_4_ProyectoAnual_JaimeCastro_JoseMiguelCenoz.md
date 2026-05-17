@@ -106,7 +106,7 @@ SELECT
     a.codItem,
     i.nomItem,
     a.dano,
-    COALESCE(ca.numCopias, 0) AS copias
+    NVL(ca.numCopias, 0) AS copias
 FROM ARMA a
 INNER JOIN ITEM i ON a.codItem = i.codItem
 LEFT JOIN COPIAS_ARMAS ca ON a.codItem = ca.codItem
